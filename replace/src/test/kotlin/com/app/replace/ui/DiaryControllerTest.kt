@@ -11,9 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.MediaType
+import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @WebMvcTest
 @AutoConfigureMockMvc
@@ -45,7 +46,37 @@ class DiaryControllerTest(
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(create_CreateDiaryRequest())
         )
-            .andExpect(MockMvcResultMatchers.header().string("location", "/url/1"))
+            .andExpect(header().string("location", "/url/1"))
+    }
+
+    @Test
+    @DisplayName("일기에 사용할 이미지를 저장하는 API를 호출하면 저장된 이미지의 URL을 적어 응답한다")
+    fun uploadImages() {
+        val mockMultipartFile =
+            MockMultipartFile("images", "imageFile.jpg", MediaType.IMAGE_JPEG_VALUE, "<<사진>>".byteInputStream())
+        val mockMultipartFile2 =
+            MockMultipartFile("images", "imageFile.jpg", MediaType.IMAGE_JPEG_VALUE, "<<사진>>".byteInputStream())
+
+        every {
+            diaryService.uploadImages(listOf(mockMultipartFile, mockMultipartFile2))
+        } returns listOf(
+            "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
+            "https://s3-us-west-2.amazonaws.com/mybucket/images/pic2.png"
+        )
+
+        val imageUploadingResponse = ImageUploadingResponse(
+            listOf(
+                "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
+                "https://s3-us-west-2.amazonaws.com/mybucket/images/pic2.png"
+            )
+        )
+
+        mockMvc.perform(
+            multipart("/diary/images")
+                .file(mockMultipartFile).file(mockMultipartFile2)
+        )
+            .andExpect(status().isCreated)
+            .andExpect(content().string(objectMapper.writeValueAsString(imageUploadingResponse)))
     }
 
     private fun create_CreateDiaryRequest(): ByteArray = objectMapper.writeValueAsBytes(

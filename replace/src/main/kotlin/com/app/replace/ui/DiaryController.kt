@@ -1,16 +1,18 @@
 package com.app.replace.ui
 
 import com.app.replace.application.DiaryService
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import java.net.URI
 
 @RestController
+@RequestMapping("/diary")
 class DiaryController(val diaryService: DiaryService) {
 
-    @PostMapping("/diary")
+    @PostMapping
     fun createDiary(@RequestBody createDiaryRequest: CreateDiaryRequest) : ResponseEntity<Long> {
         val diaryId = diaryService.createDiary(
             createDiaryRequest.title,
@@ -21,6 +23,17 @@ class DiaryController(val diaryService: DiaryService) {
 
         return ResponseEntity.created(URI.create("/url/${diaryId}")).build()
     }
+
+    @PostMapping("/images")
+    fun uploadImages(@ModelAttribute imageUploadingRequest: ImageUploadingRequest) : ResponseEntity<ImageUploadingResponse> {
+        val imageUrls = diaryService.uploadImages(imageUploadingRequest.images)
+        return ResponseEntity
+            .status(HttpStatusCode.valueOf(HttpStatus.CREATED.value()))
+            .body(ImageUploadingResponse(imageUrls))
+    }
 }
 
 data class CreateDiaryRequest(val title: String, val content: String, val shareScope: String, val images: List<String>)
+
+data class ImageUploadingRequest(val images: List<MultipartFile>)
+data class ImageUploadingResponse(val imageUrls: List<String>)
