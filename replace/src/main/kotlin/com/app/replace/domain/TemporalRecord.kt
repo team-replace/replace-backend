@@ -13,10 +13,10 @@ import java.time.LocalDateTime
 abstract class TemporalRecord {
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    protected var createdAt: LocalDateTime = LocalDateTime.MIN
+    var createdAt: LocalDateTime = LocalDateTime.MIN
 
     @LastModifiedDate
     @Column(nullable = false)
-    protected var modifiedAt: LocalDateTime = LocalDateTime.MIN
+    var modifiedAt: LocalDateTime = LocalDateTime.MIN
 }
 

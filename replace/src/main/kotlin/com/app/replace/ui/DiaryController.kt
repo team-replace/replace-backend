@@ -1,6 +1,7 @@
 package com.app.replace.ui
 
 import com.app.replace.application.DiaryService
+import com.app.replace.application.SingleDiaryRecord
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
@@ -30,6 +31,12 @@ class DiaryController(val diaryService: DiaryService) {
         return ResponseEntity
             .status(HttpStatusCode.valueOf(HttpStatus.CREATED.value()))
             .body(ImageUploadingResponse(imageUrls))
+    }
+
+    @GetMapping("/{diaryId}")
+    fun loadSingleDiary(@PathVariable diaryId: Long): ResponseEntity<SingleDiaryRecord> {
+        val diary = diaryService.loadSingleDiary(diaryId)
+        return ResponseEntity.ok(diary)
     }
 }
 

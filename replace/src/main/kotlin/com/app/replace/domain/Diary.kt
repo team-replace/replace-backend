@@ -9,10 +9,10 @@ import jakarta.persistence.Id
 
 @Entity
 class Diary(
-    @Embedded private val title: Title,
-    @Embedded private val content: Content,
-    @Embedded private val place: Place,
-    @ElementCollection private val imageURLs: List<String>,
+    @Embedded val title: Title,
+    @Embedded val content: Content,
+    @Embedded val place: Place,
+    @ElementCollection val imageURLs: List<String>,
     private val shareScope: ShareScope
  ) : TemporalRecord() {
 
