@@ -11,6 +11,7 @@ import jakarta.persistence.Id
 class Diary(
     @Embedded private val title: Title,
     @Embedded private val content: Content,
+    @Embedded private val place: Place,
     @ElementCollection private val imageURLs: List<String>,
     private val shareScope: ShareScope
 ) {

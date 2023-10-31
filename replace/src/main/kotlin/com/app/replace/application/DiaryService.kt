@@ -12,7 +12,15 @@ class DiaryService(
     private val imageService: ImageService
 ) {
     fun createDiary(title: String, content: String, shareScope: String, imageURLs: List<String>) : Long {
-        val diary = diaryRepository.save(Diary(Title(title), Content(content), imageURLs, ShareScope.valueOf(shareScope)))
+        val diary = diaryRepository.save(
+            Diary(
+                Title(title),
+                Content(content),
+                Place("루터회관", "서울 송파구 올림픽로35다길 42"), // FIXME : 요청에서 장소 정보를 받도록 수정해야 한다
+                imageURLs,
+                ShareScope.valueOf(shareScope)
+            )
+        )
         return diary.id ?: throw IllegalArgumentException("저장한 일기장의 식별자를 찾을 수 없습니다.")
     }
 
