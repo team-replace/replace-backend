@@ -9,11 +9,12 @@ import jakarta.persistence.Id
 
 @Entity
 class Diary(
-    @Embedded private val title: Title,
-    @Embedded private val content: Content,
-    @ElementCollection private val imageURLs: List<String>,
+    @Embedded val title: Title,
+    @Embedded val content: Content,
+    @Embedded val place: Place,
+    @ElementCollection val imageURLs: List<String>,
     private val shareScope: ShareScope
-) {
+ ) : TemporalRecord() {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
