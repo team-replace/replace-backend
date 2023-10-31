@@ -14,7 +14,7 @@ class Diary(
     @Embedded private val place: Place,
     @ElementCollection private val imageURLs: List<String>,
     private val shareScope: ShareScope
-) {
+ ) : TemporalRecord() {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
