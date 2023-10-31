@@ -1,6 +1,7 @@
 package com.app.replace.application
 
 import com.app.replace.domain.DiaryRepository
+import com.ninjasquad.springmockk.MockkBean
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import org.assertj.core.api.Assertions
@@ -15,8 +16,10 @@ import org.springframework.context.annotation.Import
 @Import(DiaryService::class)
 class DiaryServiceTest(
     @Autowired val diaryService: DiaryService,
-    @Autowired val diaryRepository: DiaryRepository
+    @Autowired val diaryRepository: DiaryRepository,
 ) {
+    @MockkBean
+    lateinit var imageService: ImageService
 
     @Test
     @DisplayName("이미지 저장에 필요한 정보를 입력해 일기를 저장할 수 있다.")

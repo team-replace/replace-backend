@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 
 @Service
-class ImageService(val imageUploadManager: ImageUploadManager) {
+class ImageService(private val imageUploadManager: ImageUploadManager) {
     fun uploadImage(imageUploadingRequests: List<ImageUploadingRequest>): List<String> {
         return imageUploadingRequests
             .map { request ->
