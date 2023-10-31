@@ -1,6 +1,7 @@
 package com.app.replace.application
 
 import com.app.replace.domain.*
+import com.fasterxml.jackson.annotation.JsonUnwrapped
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -49,8 +50,8 @@ data class SingleDiaryRecord(
     val place: Place,
     val createdAt: String,
     val writer: Writer,
-    val title: Title,
-    val content: Content
+    @JsonUnwrapped val title: Title,
+    @JsonUnwrapped val content: Content
 ) {
     companion object {
         fun from(diary: Diary): SingleDiaryRecord {
