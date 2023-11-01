@@ -42,6 +42,10 @@ class DiaryService(
         ))
     }
 
+    fun deleteDiary(diaryId: Long) {
+        diaryRepository.deleteById(diaryId)
+    }
+
     @Transactional(readOnly = true)
     fun loadSingleDiary(id: Long): SingleDiaryRecord {
         val diary = diaryRepository.findByIdOrNull(id) ?: throw IllegalArgumentException("id에 해당하는 일기장을 찾을 수 없습니다.")
