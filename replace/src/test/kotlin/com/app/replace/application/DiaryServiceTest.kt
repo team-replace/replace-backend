@@ -171,6 +171,15 @@ class DiaryServiceTest(
             result.imageURLs shouldHaveSize 1
         }
 
+        @Test
+        @DisplayName("일기장을 삭제할 수 있다.")
+        fun deleteDiary() {
+            val diaryId = createDiary()
+            diaryService.deleteDiary(diaryId)
+
+            diaryRepository.findAll() shouldHaveSize 0
+        }
+
         private fun createDiary(): Long {
             val diary = diaryService.createDiary(
                 "케로의 일기",

@@ -50,6 +50,12 @@ class DiaryController(val diaryService: DiaryService) {
             createDiaryRequest.images
         )
     }
+
+    @DeleteMapping("/{diaryId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteDiary(@PathVariable diaryId: Long) {
+        diaryService.deleteDiary(diaryId)
+    }
 }
 
 data class CreateDiaryRequest(val title: String, val content: String, val shareScope: String, val images: List<String>)
