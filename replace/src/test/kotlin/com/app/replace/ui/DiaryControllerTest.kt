@@ -1,6 +1,7 @@
 package com.app.replace.ui
 
 import com.app.replace.application.DiaryService
+import com.app.replace.application.ImageURLRecord
 import com.app.replace.application.SingleDiaryRecord
 import com.app.replace.application.Writer
 import com.app.replace.domain.Content
@@ -122,7 +123,7 @@ class DiaryControllerTest(
             "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
             "https://s3-us-west-2.amazonaws.com/mybucket/images/pic2.png",
             "https://my-s3-bucket.s3.eu-central-1.amazonaws.com/photos/image3.jpg"
-        ),
+        ).map { imageUrl -> ImageURLRecord(imageUrl) }.toList(),
         Place("루터회관", "서울 송파구 올림픽로35다길 42"),
         LocalDateTime.of(2023, 10, 13, 4, 1, 34, 334).toString(),
         Writer(

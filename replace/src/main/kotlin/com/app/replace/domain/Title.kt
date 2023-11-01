@@ -15,4 +15,17 @@ class Title(_title: String) {
         require(_title.length <= TITLE_MAX_LENGTH) { "일기장 제목이 ${TITLE_MAX_LENGTH}자를 초과하였습니다."}
         this.title = _title
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Title
+
+        return title == other.title
+    }
+
+    override fun hashCode(): Int {
+        return title.hashCode()
+    }
 }
