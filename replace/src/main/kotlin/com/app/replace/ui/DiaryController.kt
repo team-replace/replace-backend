@@ -1,6 +1,7 @@
 package com.app.replace.ui
 
 import com.app.replace.application.DiaryService
+import com.app.replace.application.SingleDiaryRecord
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
@@ -13,7 +14,7 @@ import java.net.URI
 class DiaryController(val diaryService: DiaryService) {
 
     @PostMapping
-    fun createDiary(@RequestBody createDiaryRequest: CreateDiaryRequest) : ResponseEntity<Long> {
+    fun createDiary(@RequestBody createDiaryRequest: CreateDiaryRequest): ResponseEntity<Long> {
         val diaryId = diaryService.createDiary(
             createDiaryRequest.title,
             createDiaryRequest.content,
@@ -25,11 +26,29 @@ class DiaryController(val diaryService: DiaryService) {
     }
 
     @PostMapping("/images")
-    fun uploadImages(@ModelAttribute imageUploadingRequest: ImageUploadingRequest) : ResponseEntity<ImageUploadingResponse> {
+    fun uploadImages(@ModelAttribute imageUploadingRequest: ImageUploadingRequest): ResponseEntity<ImageUploadingResponse> {
         val imageUrls = diaryService.uploadImages(imageUploadingRequest.images)
         return ResponseEntity
             .status(HttpStatusCode.valueOf(HttpStatus.CREATED.value()))
             .body(ImageUploadingResponse(imageUrls))
+    }
+
+    @GetMapping("/{diaryId}")
+    fun loadSingleDiary(@PathVariable diaryId: Long): ResponseEntity<SingleDiaryRecord> {
+        val diary = diaryService.loadSingleDiary(diaryId)
+        return ResponseEntity.ok(diary)
+    }
+
+    @PutMapping("/{diaryId}")
+    @ResponseStatus(HttpStatus.OK)
+    fun updateDiary(@PathVariable diaryId: Long, @ModelAttribute createDiaryRequest: CreateDiaryRequest) {
+        diaryService.updateDiary(
+            diaryId,
+            createDiaryRequest.title,
+            createDiaryRequest.content,
+            createDiaryRequest.shareScope,
+            createDiaryRequest.images
+        )
     }
 }
 

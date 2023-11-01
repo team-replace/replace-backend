@@ -1,25 +1,62 @@
 package com.app.replace.domain
 
-import jakarta.persistence.ElementCollection
-import jakarta.persistence.Embedded
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
+import jakarta.persistence.*
 
 @Entity
 class Diary(
-    @Embedded private val title: Title,
-    @Embedded private val content: Content,
-    @ElementCollection private val imageURLs: List<String>,
-    private val shareScope: ShareScope
-) {
-
+    @Embedded var title: Title,
+    @Embedded var content: Content,
+    @Embedded var place: Place,
+    imageURLs: List<ImageURL>,
+    @Enumerated(EnumType.STRING)
+    var shareScope: ShareScope
+) : TemporalRecord() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long?
 
+    @OneToMany(cascade = [CascadeType.PERSIST])
+    @JoinColumn(name = "diary_id")
+    var imageURLs: MutableList<ImageURL>
+
     init {
         this.id = null
+        this.imageURLs = imageURLs.toMutableList()
     }
+
+    fun update(diary: Diary) {
+        this.title = diary.title
+        this.content = diary.content
+        this.place = diary.place
+        this.shareScope = diary.shareScope
+        updateImageUrls(diary)
+    }
+
+    private fun updateImageUrls(diary: Diary) {
+        val additionalImageURLs = findAdditionalURLs(diary)
+        val removalImageURLs = findRemovalURLs(diary)
+        this.imageURLs.removeAll(removalImageURLs)
+        this.imageURLs.addAll(additionalImageURLs)
+    }
+
+    private fun findRemovalURLs(diary: Diary): MutableList<ImageURL> {
+        val removalImageURLs = this.imageURLs.toMutableList()
+        for (imageURL in diary.imageURLs) {
+            if (imageURLs.contains(imageURL)) {
+                removalImageURLs.remove(imageURL)
+            }
+        }
+        return removalImageURLs
+    }
+
+    private fun findAdditionalURLs(diary: Diary): MutableList<ImageURL> {
+        val additionalImageURLs = diary.imageURLs.toMutableList()
+        for (imageURL in diary.imageURLs) {
+            if (imageURLs.contains(imageURL)) {
+                additionalImageURLs.remove(imageURL)
+            }
+        }
+        return additionalImageURLs
+    }
+
 }

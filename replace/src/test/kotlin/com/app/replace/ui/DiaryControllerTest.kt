@@ -1,10 +1,17 @@
 package com.app.replace.ui
 
 import com.app.replace.application.DiaryService
+import com.app.replace.application.ImageURLRecord
+import com.app.replace.application.SingleDiaryRecord
+import com.app.replace.application.Writer
+import com.app.replace.domain.Content
+import com.app.replace.domain.Place
+import com.app.replace.domain.Title
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,16 +21,31 @@ import org.springframework.http.MediaType
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
+import org.springframework.web.filter.CharacterEncodingFilter
+import java.nio.charset.StandardCharsets
+import java.time.LocalDateTime
 
 @WebMvcTest
 @AutoConfigureMockMvc
 class DiaryControllerTest(
-    @Autowired val mockMvc: MockMvc,
     @Autowired val objectMapper: ObjectMapper,
+    @Autowired val diaryController: DiaryController
 ) {
     @MockkBean
     lateinit var diaryService: DiaryService
+
+    lateinit var mockMvc: MockMvc
+
+    @BeforeEach
+    fun setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(diaryController)
+            .addFilter<StandaloneMockMvcBuilder?>(CharacterEncodingFilter(StandardCharsets.UTF_8.name(), true))
+            .build()
+    }
 
     @Test
     @DisplayName("일기장을 저장하는 API를 호출한 후에는 Location 헤더에 ID를 적어 응답한다.")
@@ -78,6 +100,39 @@ class DiaryControllerTest(
             .andExpect(status().isCreated)
             .andExpect(content().string(objectMapper.writeValueAsString(imageUploadingResponse)))
     }
+
+    @Test
+    @DisplayName("아이디에 해당하는 일기장을 찾아 응답한다.")
+    fun loadSingleDiary() {
+        every {
+            diaryService.loadSingleDiary(1L)
+        } returns create_singleDiaryRecord()
+
+        mockMvc.perform(
+            get("/diary/{diaryId}", 1L)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .characterEncoding(StandardCharsets.UTF_8)
+        )
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk)
+            .andExpect(content().string(objectMapper.writeValueAsString(create_singleDiaryRecord())))
+    }
+
+    private fun create_singleDiaryRecord() = SingleDiaryRecord(
+        listOf(
+            "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
+            "https://s3-us-west-2.amazonaws.com/mybucket/images/pic2.png",
+            "https://my-s3-bucket.s3.eu-central-1.amazonaws.com/photos/image3.jpg"
+        ).map { imageUrl -> ImageURLRecord(imageUrl) }.toList(),
+        Place("루터회관", "서울 송파구 올림픽로35다길 42"),
+        LocalDateTime.of(2023, 10, 13, 4, 1, 34, 334).toString(),
+        Writer(
+            "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png",
+            "요아소비"
+        ),
+        Title("케로의 일기"),
+        Content("케로는 이리내와 나란히 햄버거를 먹었다. 햄버거가 생각보다 맛있어 케로 혼자 4개를 먹었다.")
+    )
 
     private fun create_CreateDiaryRequest(): ByteArray = objectMapper.writeValueAsBytes(
         CreateDiaryRequest(
