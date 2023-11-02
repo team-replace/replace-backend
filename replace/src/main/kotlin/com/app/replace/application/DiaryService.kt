@@ -66,6 +66,7 @@ class DiaryService(
 }
 
 data class SingleDiaryRecord(
+    val id: Long,
     val images: List<ImageURLRecord>,
     val place: Place,
     val createdAt: String,
@@ -76,6 +77,7 @@ data class SingleDiaryRecord(
     companion object {
         fun from(diary: Diary): SingleDiaryRecord {
             return SingleDiaryRecord(
+                diary.id ?: throw IllegalArgumentException("식별자가 존재하지 않는 일기장을 응답할 수 없습니다."),
                 diary.imageURLs
                     .map { imageURL -> ImageURLRecord(imageURL.url) }
                     .toList(),

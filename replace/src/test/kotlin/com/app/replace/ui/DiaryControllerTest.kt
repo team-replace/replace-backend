@@ -119,6 +119,7 @@ class DiaryControllerTest(
     }
 
     private fun create_singleDiaryRecord() = SingleDiaryRecord(
+        1L,
         listOf(
             "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
             "https://s3-us-west-2.amazonaws.com/mybucket/images/pic2.png",
