@@ -41,7 +41,7 @@ class DiaryController(val diaryService: DiaryService) {
 
     @PutMapping("/{diaryId}")
     @ResponseStatus(HttpStatus.OK)
-    fun updateDiary(@PathVariable diaryId: Long, @ModelAttribute createDiaryRequest: CreateDiaryRequest) {
+    fun updateDiary(@PathVariable diaryId: Long, @RequestBody createDiaryRequest: CreateDiaryRequest) {
         diaryService.updateDiary(
             diaryId,
             createDiaryRequest.title,
