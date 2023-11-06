@@ -5,8 +5,11 @@ import jakarta.persistence.*
 @Entity
 @Table(name = "users")
 class User(
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     val email: String,
+
+    @Column(unique = true, nullable = false)
+    val nickname: String,
 
     @Column(nullable = false)
     val password: String,

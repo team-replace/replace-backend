@@ -9,8 +9,10 @@ import java.util.UUID
 class UserService(
     val userRepository: UserRepository
 ) {
-    fun createUser(email: String, password: String): Long {
+    fun createUser(
+        email: String, password: String, nickname: String
+    ): Long {
         val connectionCode = UUID.randomUUID().toString()
-        return userRepository.save(User(email, password, connectionCode)).id
+        return userRepository.save(User(email, password, nickname, connectionCode)).id
     }
 }

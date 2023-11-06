@@ -21,7 +21,8 @@ class UserServiceTest(
     fun createUser() {
         val userId = userService.createUser(
             "test@gmail.com",
-            "password123!"
+            "password123!",
+            "test"
         )
         val user = userRepository.findByIdOrNull(userId) ?: fail("회원이 저장되지 않았음")
         user.connectionCode shouldNotBe null
