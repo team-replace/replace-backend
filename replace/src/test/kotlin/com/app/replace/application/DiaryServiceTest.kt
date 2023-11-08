@@ -7,9 +7,11 @@ import com.app.replace.domain.Title
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import io.mockk.every
 import jakarta.persistence.EntityManager
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -28,10 +30,23 @@ class DiaryServiceTest(
     @MockkBean
     lateinit var imageService: ImageService
 
+    @MockkBean
+    lateinit var userService: UserService
+
+    @BeforeEach
+    fun init() {
+        every { userService.loadSimpleUserInformationById(1L) } returns SimpleUserInformation(
+            "케로",
+            "https://my-s3-bucket.s3.eu-central-1.amazonaws.com"
+
+        )
+    }
+
     @Test
     @DisplayName("이미지 저장에 필요한 정보를 입력해 일기를 저장할 수 있다.")
     fun createDiary() {
         val diaryId = diaryService.createDiary(
+            1L,
             "케로의 일기",
             "케로는 이리내와 나란히 햄버거를 먹었다. 햄버거가 생각보다 맛있어 케로 혼자 4개를 먹었다.",
             "US",
@@ -63,6 +78,7 @@ class DiaryServiceTest(
             val diaryId = createDiary()
             transactionTemplate.execute {
                 diaryService.updateDiary(
+                    1L,
                     diaryId,
                     "케로의 방명록",
                     "케로는 이리내와 나란히 햄버거를 먹었다. 햄버거가 생각보다 맛있어 케로 혼자 4개를 먹었다.",
@@ -87,6 +103,7 @@ class DiaryServiceTest(
             val diaryId = createDiary()
             transactionTemplate.execute {
                 diaryService.updateDiary(
+                    1L,
                     diaryId,
                     "케로의 일기",
                     "케로는 롯데월드에 갔다. 그 곳에서 이리내와 결별했다.",
@@ -110,6 +127,7 @@ class DiaryServiceTest(
         fun addImage() {
             val diaryId = createDiary()
             diaryService.updateDiary(
+                1L,
                 diaryId,
                 "케로의 일기",
                 "케로는 이리내와 나란히 햄버거를 먹었다. 햄버거가 생각보다 맛있어 케로 혼자 4개를 먹었다.",
@@ -133,6 +151,7 @@ class DiaryServiceTest(
         fun removeImage() {
             val diaryId = createDiary()
             diaryService.updateDiary(
+                1L,
                 diaryId,
                 "케로의 일기",
                 "케로는 이리내와 나란히 햄버거를 먹었다. 햄버거가 생각보다 맛있어 케로 혼자 4개를 먹었다.",
@@ -153,6 +172,7 @@ class DiaryServiceTest(
         fun updateAll() {
             val diaryId = createDiary()
             diaryService.updateDiary(
+                1L,
                 diaryId,
                 "케로의 방명록",
                 "케로는 오늘 아무것도 하지 않았다.",
@@ -182,6 +202,7 @@ class DiaryServiceTest(
 
         private fun createDiary(): Long {
             val diary = diaryService.createDiary(
+                1L,
                 "케로의 일기",
                 "케로는 이리내와 나란히 햄버거를 먹었다. 햄버거가 생각보다 맛있어 케로 혼자 4개를 먹었다.",
                 "US",
