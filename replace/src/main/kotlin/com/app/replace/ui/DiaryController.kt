@@ -2,6 +2,7 @@ package com.app.replace.ui
 
 import com.app.replace.application.DiaryService
 import com.app.replace.application.SingleDiaryRecord
+import com.app.replace.ui.argumentresolver.Authenticated
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
@@ -14,7 +15,10 @@ import java.net.URI
 class DiaryController(val diaryService: DiaryService) {
 
     @PostMapping
-    fun createDiary(@RequestBody createDiaryRequest: CreateDiaryRequest): ResponseEntity<Long> {
+    fun createDiary(
+        @Authenticated userId: Long?,
+        @RequestBody createDiaryRequest: CreateDiaryRequest
+    ): ResponseEntity<Long> {
         val diaryId = diaryService.createDiary(
             createDiaryRequest.title,
             createDiaryRequest.content,
@@ -26,7 +30,9 @@ class DiaryController(val diaryService: DiaryService) {
     }
 
     @PostMapping("/images")
-    fun uploadImages(@ModelAttribute imageUploadingRequest: ImageUploadingRequest): ResponseEntity<ImageUploadingResponse> {
+    fun uploadImages(
+        @ModelAttribute imageUploadingRequest: ImageUploadingRequest
+    ): ResponseEntity<ImageUploadingResponse> {
         val imageUrls = diaryService.uploadImages(imageUploadingRequest.images)
         return ResponseEntity
             .status(HttpStatusCode.valueOf(HttpStatus.CREATED.value()))
@@ -34,14 +40,19 @@ class DiaryController(val diaryService: DiaryService) {
     }
 
     @GetMapping("/{diaryId}")
-    fun loadSingleDiary(@PathVariable diaryId: Long): ResponseEntity<SingleDiaryRecord> {
+    fun loadSingleDiary(
+        @PathVariable diaryId: Long
+    ): ResponseEntity<SingleDiaryRecord> {
         val diary = diaryService.loadSingleDiary(diaryId)
         return ResponseEntity.ok(diary)
     }
 
     @PutMapping("/{diaryId}")
     @ResponseStatus(HttpStatus.OK)
-    fun updateDiary(@PathVariable diaryId: Long, @RequestBody createDiaryRequest: CreateDiaryRequest) {
+    fun updateDiary(
+        @PathVariable diaryId: Long,
+        @RequestBody createDiaryRequest: CreateDiaryRequest
+    ) {
         diaryService.updateDiary(
             diaryId,
             createDiaryRequest.title,
@@ -53,7 +64,9 @@ class DiaryController(val diaryService: DiaryService) {
 
     @DeleteMapping("/{diaryId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteDiary(@PathVariable diaryId: Long) {
+    fun deleteDiary(
+        @PathVariable diaryId: Long
+    ) {
         diaryService.deleteDiary(diaryId)
     }
 }

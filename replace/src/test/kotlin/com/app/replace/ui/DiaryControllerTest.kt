@@ -1,12 +1,10 @@
 package com.app.replace.ui
 
-import com.app.replace.application.DiaryService
-import com.app.replace.application.ImageURLRecord
-import com.app.replace.application.SingleDiaryRecord
-import com.app.replace.application.Writer
+import com.app.replace.application.*
 import com.app.replace.domain.Content
 import com.app.replace.domain.Place
 import com.app.replace.domain.Title
+import com.app.replace.domain.UserRepository
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
@@ -38,6 +36,9 @@ class DiaryControllerTest(
     @MockkBean
     lateinit var diaryService: DiaryService
 
+    @MockkBean
+    lateinit var userRepository: UserRepository
+
     lateinit var mockMvc: MockMvc
 
     @BeforeEach
@@ -45,6 +46,8 @@ class DiaryControllerTest(
         mockMvc = MockMvcBuilders.standaloneSetup(diaryController)
             .addFilter<StandaloneMockMvcBuilder?>(CharacterEncodingFilter(StandardCharsets.UTF_8.name(), true))
             .build()
+
+        every { userRepository.findIdByNickname(any()) } returns 1L
     }
 
     @Test

@@ -13,6 +13,6 @@ class UserService(
         email: String, password: String, nickname: String
     ): Long {
         val connectionCode = UUID.randomUUID().toString()
-        return userRepository.save(User(email, password, nickname, connectionCode)).id
+        return userRepository.save(User(email, nickname, password, connectionCode)).id
     }
 }
