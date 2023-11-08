@@ -8,7 +8,7 @@ import java.util.UUID
 
 @Service
 class UserService(
-    val userRepository: UserRepository
+    private val userRepository: UserRepository
 ) {
     fun createUser(
         email: String, password: String, nickname: String

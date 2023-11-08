@@ -4,56 +4,30 @@ import com.app.replace.application.*
 import com.app.replace.domain.Content
 import com.app.replace.domain.Place
 import com.app.replace.domain.Title
-import com.app.replace.domain.UserRepository
-import com.app.replace.ui.argumentresolver.AuthenticationArgumentResolver
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockMultipartFile
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
-import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
-import org.springframework.web.filter.CharacterEncodingFilter
 import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
 
-@WebMvcTest
+@WebMvcTest(controllers = [DiaryController::class])
 @AutoConfigureMockMvc
 class DiaryControllerTest(
     @Autowired val objectMapper: ObjectMapper,
     @Autowired val diaryController: DiaryController,
-    @Autowired val authenticationInterceptor: AuthenticationInterceptor,
-    @Autowired val authenticationArgumentResolver: AuthenticationArgumentResolver
-) {
+) : MockMvcPreparingManager(diaryController) {
+
     @MockkBean
     lateinit var diaryService: DiaryService
-
-    @MockkBean
-    lateinit var userRepository: UserRepository
-
-    lateinit var mockMvc: MockMvc
-
-    @BeforeEach
-    fun setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(diaryController)
-            .addFilter<StandaloneMockMvcBuilder?>(CharacterEncodingFilter(StandardCharsets.UTF_8.name(), true))
-            .addInterceptors(authenticationInterceptor)
-            .setCustomArgumentResolvers(authenticationArgumentResolver)
-            .build()
-
-        every { userRepository.findIdByNickname(any()) } returns 1L
-    }
 
     @Test
     fun `일기장을 저장하는 API를 호출한 후에는 Location 헤더에 ID를 적어 응답한다`() {
