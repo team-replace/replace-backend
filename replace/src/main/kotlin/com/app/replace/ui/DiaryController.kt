@@ -16,10 +16,11 @@ class DiaryController(val diaryService: DiaryService) {
 
     @PostMapping
     fun createDiary(
-        @Authenticated userId: Long?,
+        @Authenticated userId: Long,
         @RequestBody createDiaryRequest: CreateDiaryRequest
     ): ResponseEntity<Long> {
         val diaryId = diaryService.createDiary(
+            userId,
             createDiaryRequest.title,
             createDiaryRequest.content,
             createDiaryRequest.shareScope,
@@ -50,10 +51,12 @@ class DiaryController(val diaryService: DiaryService) {
     @PutMapping("/{diaryId}")
     @ResponseStatus(HttpStatus.OK)
     fun updateDiary(
+        @Authenticated userId: Long,
         @PathVariable diaryId: Long,
         @RequestBody createDiaryRequest: CreateDiaryRequest
     ) {
         diaryService.updateDiary(
+            userId,
             diaryId,
             createDiaryRequest.title,
             createDiaryRequest.content,
@@ -65,6 +68,7 @@ class DiaryController(val diaryService: DiaryService) {
     @DeleteMapping("/{diaryId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteDiary(
+        @Authenticated userId: Long,
         @PathVariable diaryId: Long
     ) {
         diaryService.deleteDiary(diaryId)

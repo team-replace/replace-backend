@@ -8,6 +8,7 @@ class Diary(
     @Embedded var content: Content,
     @Embedded var place: Place,
     imageURLs: List<ImageURL>,
+    var userId: Long?,
     @Enumerated(EnumType.STRING)
     var shareScope: ShareScope
 ) : TemporalRecord() {

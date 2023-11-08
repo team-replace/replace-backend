@@ -5,6 +5,7 @@ import com.app.replace.domain.Content
 import com.app.replace.domain.Place
 import com.app.replace.domain.Title
 import com.app.replace.domain.UserRepository
+import com.app.replace.ui.argumentresolver.AuthenticationArgumentResolver
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
@@ -31,7 +32,9 @@ import java.time.LocalDateTime
 @AutoConfigureMockMvc
 class DiaryControllerTest(
     @Autowired val objectMapper: ObjectMapper,
-    @Autowired val diaryController: DiaryController
+    @Autowired val diaryController: DiaryController,
+    @Autowired val authenticationInterceptor: AuthenticationInterceptor,
+    @Autowired val authenticationArgumentResolver: AuthenticationArgumentResolver
 ) {
     @MockkBean
     lateinit var diaryService: DiaryService
@@ -45,16 +48,18 @@ class DiaryControllerTest(
     fun setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(diaryController)
             .addFilter<StandaloneMockMvcBuilder?>(CharacterEncodingFilter(StandardCharsets.UTF_8.name(), true))
+            .addInterceptors(authenticationInterceptor)
+            .setCustomArgumentResolvers(authenticationArgumentResolver)
             .build()
 
         every { userRepository.findIdByNickname(any()) } returns 1L
     }
 
     @Test
-    @DisplayName("일기장을 저장하는 API를 호출한 후에는 Location 헤더에 ID를 적어 응답한다.")
-    fun createDiary() {
+    fun `일기장을 저장하는 API를 호출한 후에는 Location 헤더에 ID를 적어 응답한다`() {
         every {
             diaryService.createDiary(
+                1L,
                 "케로의 일기",
                 "케로는 이리내와 나란히 햄버거를 먹었다. 햄버거가 생각보다 맛있어 케로 혼자 4개를 먹었다.",
                 "US",
@@ -69,14 +74,14 @@ class DiaryControllerTest(
         mockMvc.perform(
             post("/diary")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header(AUTHENTICATION_HEADER_NAME, "pobi")
                 .content(create_CreateDiaryRequest())
         )
             .andExpect(header().string("location", "/url/1"))
     }
 
     @Test
-    @DisplayName("일기에 사용할 이미지를 저장하는 API를 호출하면 저장된 이미지의 URL을 적어 응답한다")
-    fun uploadImages() {
+    fun `일기에 사용할 이미지를 저장하는 API를 호출하면 저장된 이미지의 URL을 적어 응답한다`() {
         val mockMultipartFile =
             MockMultipartFile("images", "imageFile.jpg", MediaType.IMAGE_JPEG_VALUE, "<<사진>>".byteInputStream())
         val mockMultipartFile2 =
@@ -105,8 +110,7 @@ class DiaryControllerTest(
     }
 
     @Test
-    @DisplayName("아이디에 해당하는 일기장을 찾아 응답한다.")
-    fun loadSingleDiary() {
+    fun `아이디에 해당하는 일기장을 찾아 응답한다`() {
         every {
             diaryService.loadSingleDiary(1L)
         } returns create_singleDiaryRecord()

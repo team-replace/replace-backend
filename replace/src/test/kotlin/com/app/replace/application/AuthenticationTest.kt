@@ -42,6 +42,7 @@ class AuthenticationTest(
     fun `인증 정보를 요구하는 요청에 인증되지 않은 요청을 보내면 예외가 발생한다`() {
         every {
             diaryService.createDiary(
+                1L,
                 "케로의 일기",
                 "케로는 이리내와 나란히 햄버거를 먹었다. 햄버거가 생각보다 맛있어 케로 혼자 4개를 먹었다.",
                 "US",
@@ -73,6 +74,7 @@ class AuthenticationTest(
     fun `인증 정보가 유효한 요청을 보내면 요청에 성공한다`() {
         every {
             diaryService.createDiary(
+                1L,
                 "케로의 일기",
                 "케로는 이리내와 나란히 햄버거를 먹었다. 햄버거가 생각보다 맛있어 케로 혼자 4개를 먹었다.",
                 "US",
