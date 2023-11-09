@@ -2,6 +2,8 @@ package com.app.replace.domain
 
 import jakarta.persistence.*
 
+const val CODE_MAX_LENGTH = 10
+
 @Entity
 @Table(name = "users")
 class User(
@@ -20,4 +22,10 @@ class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L
-) : TemporalRecord()
+) : TemporalRecord() {
+    init {
+        if (CODE_MAX_LENGTH < connectionCode.length) {
+            throw IllegalArgumentException("코드의 길이가 ${CODE_MAX_LENGTH}자를 초과할 수 없습니다.")
+        }
+    }
+}
