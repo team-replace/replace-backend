@@ -80,6 +80,19 @@ class ConnectionServiceTest(
     }
 
     @Test
+    fun `당연하지만 자기 자신과 연결할 수 없다`(
+        @Autowired userService: UserService,
+        @Autowired entityManager: EntityManager
+    ) {
+        val userId = `creates a User and returns id`(userService, "test@gmail.com", "Hongo")
+        val myCode = connectionService.loadConnection(userId)
+        assertThatThrownBy { connectionService.makeConnection(userId, myCode) }
+            .isInstanceOf(ConnectingWithItSelfException::class.java)
+            .hasMessage("자기 자신과 연결할 수 없습니다.")
+            .extracting("code").isEqualTo(5004)
+    }
+
+    @Test
     @Disabled
     fun `재연결 불가능한 코드를 입력하여 발생하는 오류 코드는 5001번이다`(
         @Autowired userService: UserService

@@ -10,10 +10,8 @@ class DataSupporter(
 ) {
     @PostConstruct
     fun init() {
-        userService.createUser(
-            "pobi@gmail.com",
-            "password123!",
-            "pobi"
-        )
+        userService.createUser("pobi@gmail.com", "password123!", "pobi")
+        userService.createUser("lisa@gmail.com", "password123!", "lisa")
+        userService.createUser("wony@gmail.com", "password123!", "wony")
     }
 }
