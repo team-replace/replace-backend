@@ -1,5 +1,6 @@
 package com.app.replace.application
 
+import com.app.replace.domain.CODE_MAX_LENGTH
 import com.app.replace.domain.User
 import com.app.replace.domain.UserRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -14,6 +15,8 @@ class UserService(
         email: String, password: String, nickname: String
     ): Long {
         val connectionCode = UUID.randomUUID().toString()
+            .replace("-", "")
+            .substring(0, CODE_MAX_LENGTH)
         return userRepository.save(User(email, nickname, password, connectionCode)).id
     }
 
