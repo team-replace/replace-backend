@@ -4,7 +4,6 @@ import com.app.replace.application.*
 import com.app.replace.domain.Content
 import com.app.replace.domain.Place
 import com.app.replace.domain.Title
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import org.junit.jupiter.api.Test
@@ -22,7 +21,6 @@ import java.time.LocalDateTime
 @WebMvcTest(controllers = [DiaryController::class])
 @AutoConfigureMockMvc
 class DiaryControllerTest(
-    @Autowired val objectMapper: ObjectMapper,
     @Autowired val diaryController: DiaryController,
 ) : MockMvcPreparingManager(diaryController) {
 

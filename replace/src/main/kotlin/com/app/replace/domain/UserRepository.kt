@@ -9,4 +9,7 @@ interface UserRepository : JpaRepository<User, Long> {
 
     @Query("select u.connectionCode from User u where u.id = :userId")
     fun findConnectionCodeById(userId: Long): String?
+
+    @Query("select u.id from User u where u.connectionCode = :connectionCode")
+    fun findIdByConnectionCode(connectionCode: String): Long?
 }

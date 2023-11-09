@@ -3,6 +3,7 @@ package com.app.replace.ui
 import com.app.replace.application.AuthenticationInterceptor
 import com.app.replace.domain.UserRepository
 import com.app.replace.ui.argumentresolver.AuthenticationArgumentResolver
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import org.junit.jupiter.api.BeforeEach
@@ -18,6 +19,8 @@ abstract class MockMvcPreparingManager(
 ) {
     @Autowired lateinit var authenticationInterceptor: AuthenticationInterceptor
     @Autowired lateinit var authenticationArgumentResolver: AuthenticationArgumentResolver
+    @Autowired lateinit var exceptionControllerAdvisor: ExceptionControllerAdvisor
+    @Autowired lateinit var objectMapper: ObjectMapper
 
     @MockkBean
     lateinit var userRepository: UserRepository
@@ -30,6 +33,7 @@ abstract class MockMvcPreparingManager(
             .addFilter<StandaloneMockMvcBuilder?>(CharacterEncodingFilter(StandardCharsets.UTF_8.name(), true))
             .addInterceptors(authenticationInterceptor)
             .setCustomArgumentResolvers(authenticationArgumentResolver)
+            .setControllerAdvice(exceptionControllerAdvisor)
             .build()
 
         every { userRepository.findIdByNickname(any()) } returns 1L
