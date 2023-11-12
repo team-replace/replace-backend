@@ -108,8 +108,19 @@ class ConnectionControllerTest(
     }
 
     @Test
-    @Disabled
     fun `재연결 불가능한 코드를 입력하여 발생하는 오류 코드는 5001번이다`() {
+        every { connectionService.makeConnection(any(), any()) } throws CannotReconnectException()
 
+        val requestBody = objectMapper.writeValueAsString(MakingConnectionRequest(UUID.randomUUID().toString()))
+
+        mockMvc.perform(
+            MockMvcRequestBuilders.post("/connection/code")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(requestBody)
+                .header(AUTHENTICATION_HEADER_NAME, "pobi")
+        )
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isBadRequest)
+            .andExpect(jsonPath("errorCode").value(5001))
     }
 }
