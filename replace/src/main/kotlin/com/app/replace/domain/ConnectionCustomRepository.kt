@@ -6,4 +6,6 @@ interface ConnectionCustomRepository {
     fun deleteByUserId(userId: Long)
 
     fun existsDeletedConnectionHavingHostIdAndPartnerId(hostId: Long, partnerId: Long): Boolean
+
+    fun findHavingId(userId: Long): Connection?
 }
