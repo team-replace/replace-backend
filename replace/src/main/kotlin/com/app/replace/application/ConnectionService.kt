@@ -14,6 +14,7 @@ class ConnectionService(
     private val userRepository: UserRepository,
     private val connectionRepository: ConnectionRepository
 ) {
+    @Transactional(readOnly = true)
     fun loadConnection(userId: Long) : String {
         return userRepository.findConnectionCodeById(userId)
             ?: throw IllegalArgumentException("식별자에 해당하는 회원이 존재하지 않거나, 회원은 존재하나 고유 코드가 존재하지 않습니다.")
@@ -35,6 +36,16 @@ class ConnectionService(
 
     fun disconnect(userId: Long) {
         connectionRepository.deleteByUserId(userId)
+    }
+
+    @Transactional(readOnly = true)
+    fun findPartnerIdByUserId(userId: Long): Long? {
+        val connection = connectionRepository.findHavingId(userId) ?: return null
+        return if (Objects.equals(connection.hostId, userId)) {
+            connection.partnerId
+        } else {
+            connection.hostId
+        }
     }
 
     private fun `is connecting with myself`(userId: Long, partnerId: Long) {

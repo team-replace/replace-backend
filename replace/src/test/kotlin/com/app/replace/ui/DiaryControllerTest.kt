@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.nio.charset.StandardCharsets
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @WebMvcTest(controllers = [DiaryController::class])
@@ -95,6 +96,161 @@ class DiaryControllerTest(
             .andDo(MockMvcResultHandlers.print())
             .andExpect(status().isOk)
             .andExpect(content().string(objectMapper.writeValueAsString(create_singleDiaryRecord())))
+    }
+
+    @Test
+    fun `커플 연결이 되지 않았을 때에는 내가 작성한 일기만 보여준다`() {
+        every { diaryService.loadDiaries(1L, LocalDate.of(2023, 4, 15)) } returns DiaryPreviews(
+            listOf(
+                DiaryPreview(
+                    Writer(
+                        "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png",
+                        "요아소비"
+                    ),
+                    listOf(
+                        DiaryContentPreview(
+                            "테스트 제목 1",
+                            listOf(
+                                "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
+                                "https://s3-us-west-2.amazonaws.com/mybucket/images/pic2.png",
+                                "https://my-s3-bucket.s3.eu-central-1.amazonaws.com/photos/image3.jpg"
+                            ),
+                            4,
+                            LocalDateTime.of(2023, 4, 15, 9, 56, 33, 22233)
+                        ),
+                        DiaryContentPreview(
+                            "테스트 제목 2",
+                            listOf(
+                                "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
+                                "https://s3-us-west-2.amazonaws.com/mybucket/images/pic2.png",
+                                "https://my-s3-bucket.s3.eu-central-1.amazonaws.com/photos/image3.jpg"
+                            ),
+                            4,
+                            LocalDateTime.of(2023, 4, 15, 2, 1, 11, 998)
+                        )
+                    )
+                )
+            )
+        )
+
+        mockMvc.perform(
+            get("/diarys")
+                .param("year", "2023")
+                .param("month", "4")
+                .param("day", "15")
+                .header(AUTHENTICATION_HEADER_NAME, "pobi")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .characterEncoding(StandardCharsets.UTF_8)
+        )
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.diaries[0].user.profileImage").value("https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png"))
+            .andExpect(jsonPath("$.diaries[0].user.nickname").value("요아소비"))
+            .andExpect(jsonPath("$.diaries[0].contents[0].title").value("테스트 제목 1"))
+            .andExpect(jsonPath("$.diaries[0].contents[0].thumbnails.size()").value(3))
+            .andExpect(jsonPath("$.diaries[0].contents[0].numOfExtraThumbnails").value(4))
+            .andExpect(jsonPath("$.diaries[0].contents[0].createdAt").isNotEmpty)
+            .andExpect(jsonPath("$.diaries[0].contents[1].title").value("테스트 제목 2"))
+            .andExpect(jsonPath("$.diaries[0].contents[1].thumbnails.size()").value(3))
+            .andExpect(jsonPath("$.diaries[0].contents[1].numOfExtraThumbnails").value(4))
+            .andExpect(jsonPath("$.diaries[0].contents[1].createdAt").isNotEmpty)
+    }
+
+    @Test
+    fun `커플 연결이 되었을 경우 내 일기 파트너 일기 순서대로 보여준다`() {
+        every { diaryService.loadDiaries(1L, LocalDate.of(2023, 4, 15)) } returns DiaryPreviews(
+            listOf(
+                DiaryPreview(
+                    Writer(
+                        "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png",
+                        "요아소비"
+                    ),
+                    listOf(
+                        DiaryContentPreview(
+                            "테스트 제목 1",
+                            listOf(
+                                "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
+                                "https://s3-us-west-2.amazonaws.com/mybucket/images/pic2.png",
+                                "https://my-s3-bucket.s3.eu-central-1.amazonaws.com/photos/image3.jpg"
+                            ),
+                            4,
+                            LocalDateTime.of(2023, 4, 15, 9, 56, 33, 22233)
+                        ),
+                        DiaryContentPreview(
+                            "테스트 제목 2",
+                            listOf(
+                                "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
+                                "https://s3-us-west-2.amazonaws.com/mybucket/images/pic2.png",
+                                "https://my-s3-bucket.s3.eu-central-1.amazonaws.com/photos/image3.jpg"
+                            ),
+                            4,
+                            LocalDateTime.of(2023, 4, 15, 2, 1, 11, 998)
+                        )
+                    )
+                ),
+                DiaryPreview(
+                    Writer(
+                        "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png",
+                        "뽀또"
+                    ),
+                    listOf(
+                        DiaryContentPreview(
+                            "테스트 제목 3",
+                            listOf(
+                                "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
+                                "https://s3-us-west-2.amazonaws.com/mybucket/images/pic2.png",
+                                "https://my-s3-bucket.s3.eu-central-1.amazonaws.com/photos/image3.jpg"
+                            ),
+                            4,
+                            LocalDateTime.of(2023, 4, 15, 9, 56, 33, 22233)
+                        ),
+                        DiaryContentPreview(
+                            "테스트 제목 4",
+                            listOf(
+                                "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
+                                "https://s3-us-west-2.amazonaws.com/mybucket/images/pic2.png",
+                                "https://my-s3-bucket.s3.eu-central-1.amazonaws.com/photos/image3.jpg"
+                            ),
+                            4,
+                            LocalDateTime.of(2023, 4, 15, 2, 1, 11, 998)
+                        )
+                    )
+                )
+            )
+        )
+
+        mockMvc.perform(
+            get("/diarys")
+                .param("year", "2023")
+                .param("month", "4")
+                .param("day", "15")
+                .header(AUTHENTICATION_HEADER_NAME, "pobi")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .characterEncoding(StandardCharsets.UTF_8)
+        )
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.diaries.size()").value(2))
+            .andExpect(jsonPath("$.diaries[0].user.nickname").value("요아소비"))
+            .andExpect(jsonPath("$.diaries[1].user.nickname").value("뽀또"))
+    }
+
+    @Test
+    fun `선택 불가능한 날짜를 입력했을 때 발생하는 예외 코드는 7000이다`() {
+        every { diaryService.loadDiaries(any(), LocalDate.of(2099, 4, 15)) } throws InvalidDateException()
+
+        mockMvc.perform(
+            get("/diarys")
+                .param("year", "2099")
+                .param("month", "4")
+                .param("day", "15")
+                .header(AUTHENTICATION_HEADER_NAME, "pobi")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .characterEncoding(StandardCharsets.UTF_8)
+        )
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isBadRequest)
+            .andExpect(jsonPath("errorCode").value(7000))
     }
 
     private fun create_singleDiaryRecord() = SingleDiaryRecord(

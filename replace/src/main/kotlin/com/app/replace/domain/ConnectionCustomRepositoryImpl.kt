@@ -33,4 +33,13 @@ class ConnectionCustomRepositoryImpl(
 
         return count != 0L
     }
+
+    override fun findHavingId(userId: Long): Connection? {
+        return entityManager.createQuery(
+            "select c from Connection c where c.hostId = :userId or c.partnerId = :userId",
+            Connection::class.java
+        )
+            .setParameter("userId", userId)
+            .singleResult
+    }
 }
