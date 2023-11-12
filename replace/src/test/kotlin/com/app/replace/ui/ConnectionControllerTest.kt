@@ -23,7 +23,8 @@ class ConnectionControllerTest(
     @Autowired private val connectionController: ConnectionController
 ) : MockMvcPreparingManager(connectionController) {
 
-    @MockkBean lateinit var connectionService: ConnectionService
+    @MockkBean
+    lateinit var connectionService: ConnectionService
 
     @Test
     fun `나에게 고유하게 할당된 코드를 가져올 수 있다`() {
@@ -108,8 +109,32 @@ class ConnectionControllerTest(
     }
 
     @Test
-    @Disabled
     fun `재연결 불가능한 코드를 입력하여 발생하는 오류 코드는 5001번이다`() {
+        every { connectionService.makeConnection(any(), any()) } throws CannotReconnectException()
 
+        val requestBody = objectMapper.writeValueAsString(MakingConnectionRequest(UUID.randomUUID().toString()))
+
+        mockMvc.perform(
+            MockMvcRequestBuilders.post("/connection/code")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(requestBody)
+                .header(AUTHENTICATION_HEADER_NAME, "pobi")
+        )
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isBadRequest)
+            .andExpect(jsonPath("errorCode").value(5001))
+    }
+
+    @Test
+    fun `커플의 연결을 해제할 수 있다`() {
+        every { connectionService.disconnect(any()) } just runs
+
+        mockMvc.perform(
+            MockMvcRequestBuilders.post("/connection/abort")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header(AUTHENTICATION_HEADER_NAME, "pobi")
+        )
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk)
     }
 }

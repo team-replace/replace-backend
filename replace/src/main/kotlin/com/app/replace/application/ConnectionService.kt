@@ -26,11 +26,15 @@ class ConnectionService(
         `is connecting with myself`(userId, partnerId)
         `am I already connected with another`(userId)
         `is partner already connected with another`(partnerId)
-        // TODO: 삭제된 후 다시 연결할 수 없는 제약사항을 추가해야 한다
+        `have they been broken once`(userId, partnerId)
 
         connectionRepository.save(
             Connection(arrayOf(userId, partnerId).min(), arrayOf(userId, partnerId).max())
         )
+    }
+
+    fun disconnect(userId: Long) {
+        connectionRepository.deleteByUserId(userId)
     }
 
     private fun `is connecting with myself`(userId: Long, partnerId: Long) {
@@ -40,14 +44,20 @@ class ConnectionService(
     }
 
     private fun `is partner already connected with another`(partnerId: Long) {
-        if (connectionRepository.existsConnectionHavingId(partnerId)) {
+        if (connectionRepository.existsConnectionHavingUserId(partnerId)) {
             throw PartnerAlreadyHavingConnectionException()
         }
     }
 
     private fun `am I already connected with another`(userId: Long) {
-        if (connectionRepository.existsConnectionHavingId(userId)) {
+        if (connectionRepository.existsConnectionHavingUserId(userId)) {
             throw UserAlreadyHavingConnectionException()
+        }
+    }
+
+    private fun `have they been broken once`(userId: Long, partnerId: Long) {
+        if (connectionRepository.existsDeletedConnectionHavingHostIdAndPartnerId(userId, partnerId)) {
+            throw CannotReconnectException()
         }
     }
 }
