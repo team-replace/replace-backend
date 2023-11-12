@@ -212,8 +212,8 @@ class DiaryServiceTest(
 
         val diaries = diaryService.loadDiaries(1L, LocalDate.now())
 
-        diaries.diaryPreviews shouldHaveSize 1
-        diaries.diaryPreviews.get(0).contents shouldHaveSize 2
+        diaries.diaries shouldHaveSize 1
+        diaries.diaries.get(0).contents shouldHaveSize 2
     }
 
     @Test
@@ -230,13 +230,13 @@ class DiaryServiceTest(
 
         val diaries = diaryService.loadDiaries(1L, LocalDate.now())
 
-        diaries.diaryPreviews shouldHaveSize 2
+        diaries.diaries shouldHaveSize 2
 
-        diaries.diaryPreviews.get(0).contents shouldHaveSize 2
-        diaries.diaryPreviews.get(0).user.nickname shouldBe "케로"
+        diaries.diaries.get(0).contents shouldHaveSize 2
+        diaries.diaries.get(0).user.nickname shouldBe "케로"
 
-        diaries.diaryPreviews.get(1).contents shouldHaveSize 1
-        diaries.diaryPreviews.get(1).user.nickname shouldBe "말랑"
+        diaries.diaries.get(1).contents shouldHaveSize 1
+        diaries.diaries.get(1).user.nickname shouldBe "말랑"
     }
 
     @Test

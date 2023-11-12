@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Service
@@ -107,7 +108,7 @@ class DiaryService(
 }
 
 data class DiaryPreviews(
-    val diaryPreviews: List<DiaryPreview>
+    val diaries: List<DiaryPreview>
 )
 
 data class DiaryPreview(
@@ -119,7 +120,7 @@ data class DiaryContentPreview(
     val title: String,
     val thumbnails: List<String>,
     val numOfExtraThumbnails: Int,
-    val createdAt: LocalDate
+    val createdAt: LocalDateTime
 ) {
     companion object {
         fun from(diary: Diary): DiaryContentPreview {
@@ -128,7 +129,7 @@ data class DiaryContentPreview(
                 diary.title.title,
                 thumbnails.subList(0, 2),
                 if (3 < thumbnails.size) thumbnails.size - 3 else 0,
-                diary.createdAt.toLocalDate()
+                diary.createdAt
             )
         }
     }

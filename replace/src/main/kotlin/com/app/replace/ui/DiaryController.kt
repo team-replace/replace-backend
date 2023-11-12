@@ -1,5 +1,6 @@
 package com.app.replace.ui
 
+import com.app.replace.application.DiaryPreviews
 import com.app.replace.application.DiaryService
 import com.app.replace.application.SingleDiaryRecord
 import com.app.replace.ui.argumentresolver.Authenticated
@@ -9,12 +10,12 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.net.URI
+import java.time.LocalDate
 
 @RestController
-@RequestMapping("/diary")
 class DiaryController(val diaryService: DiaryService) {
 
-    @PostMapping
+    @PostMapping("/diary")
     fun createDiary(
         @Authenticated userId: Long,
         @RequestBody createDiaryRequest: CreateDiaryRequest
@@ -30,7 +31,7 @@ class DiaryController(val diaryService: DiaryService) {
         return ResponseEntity.created(URI.create("/url/${diaryId}")).build()
     }
 
-    @PostMapping("/images")
+    @PostMapping("/diary/images")
     fun uploadImages(
         @ModelAttribute imageUploadingRequest: ImageUploadingRequest
     ): ResponseEntity<ImageUploadingResponse> {
@@ -40,7 +41,7 @@ class DiaryController(val diaryService: DiaryService) {
             .body(ImageUploadingResponse(imageUrls))
     }
 
-    @GetMapping("/{diaryId}")
+    @GetMapping("/diary/{diaryId}")
     fun loadSingleDiary(
         @PathVariable diaryId: Long
     ): ResponseEntity<SingleDiaryRecord> {
@@ -48,7 +49,7 @@ class DiaryController(val diaryService: DiaryService) {
         return ResponseEntity.ok(diary)
     }
 
-    @PutMapping("/{diaryId}")
+    @PutMapping("/diary/{diaryId}")
     @ResponseStatus(HttpStatus.OK)
     fun updateDiary(
         @Authenticated userId: Long,
@@ -65,13 +66,24 @@ class DiaryController(val diaryService: DiaryService) {
         )
     }
 
-    @DeleteMapping("/{diaryId}")
+    @DeleteMapping("/diary/{diaryId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteDiary(
         @Authenticated userId: Long,
         @PathVariable diaryId: Long
     ) {
         diaryService.deleteDiary(diaryId)
+    }
+
+    @GetMapping("/diarys")
+    fun loadDiaries(
+        @Authenticated userId: Long,
+        @RequestParam(name = "year") year: Int,
+        @RequestParam(name = "month") month: Int,
+        @RequestParam(name = "day") day: Int
+    ): ResponseEntity<DiaryPreviews> {
+        val localDate = LocalDate.of(year, month, day)
+        return ResponseEntity.ok(diaryService.loadDiaries(userId, localDate))
     }
 }
 
