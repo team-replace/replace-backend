@@ -41,25 +41,27 @@ class UserService(
             val partner = userRepository.findByIdOrNull(partnerId)
                 ?: throw IllegalArgumentException("식별자에 해당하는 유저 정보를 찾을 수 없습니다.")
             return UserInformationWithPartner(
-                SimpleUserInformation(user.nickname, "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png"),
-                SimpleUserInformation(partner.nickname, "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png")
+                SimpleUserProfile(user.nickname, "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png"),
+                SimpleUserProfile(partner.nickname, "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png")
             )
         }
 
-        return AloneUserInformation(SimpleUserInformation(user.nickname, "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png"))
+        return AloneUserInformation(SimpleUserProfile(user.nickname, "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png"))
     }
 }
 
 data class SimpleUserInformation(val nickname: String, val imageUrl: String)
 
+data class SimpleUserProfile(val nickname: String, val profileImage: String)
+
 abstract class UserInformation {
-    abstract val user: SimpleUserInformation
+    abstract val user: SimpleUserProfile
 }
 
-data class AloneUserInformation(override val user: SimpleUserInformation) : UserInformation()
+data class AloneUserInformation(override val user: SimpleUserProfile) : UserInformation()
 
 data class UserInformationWithPartner(
-    override val user: SimpleUserInformation,
-    val partner: SimpleUserInformation
+    override val user: SimpleUserProfile,
+    val partner: SimpleUserProfile
 ) : UserInformation()
 
