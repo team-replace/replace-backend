@@ -109,6 +109,7 @@ class DiaryControllerTest(
                     ),
                     listOf(
                         DiaryContentPreview(
+                            1L,
                             "테스트 제목 1",
                             listOf(
                                 "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
@@ -119,6 +120,7 @@ class DiaryControllerTest(
                             LocalDateTime.of(2023, 4, 15, 9, 56, 33, 22233)
                         ),
                         DiaryContentPreview(
+                            1L,
                             "테스트 제목 2",
                             listOf(
                                 "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
@@ -146,6 +148,7 @@ class DiaryControllerTest(
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.diaries[0].user.profileImage").value("https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png"))
             .andExpect(jsonPath("$.diaries[0].user.nickname").value("요아소비"))
+            .andExpect(jsonPath("$.diaries[0].contents[0].id").value(1L))
             .andExpect(jsonPath("$.diaries[0].contents[0].title").value("테스트 제목 1"))
             .andExpect(jsonPath("$.diaries[0].contents[0].thumbnails.size()").value(3))
             .andExpect(jsonPath("$.diaries[0].contents[0].numOfExtraThumbnails").value(4))
@@ -167,6 +170,7 @@ class DiaryControllerTest(
                     ),
                     listOf(
                         DiaryContentPreview(
+                            1L,
                             "테스트 제목 1",
                             listOf(
                                 "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
@@ -177,6 +181,7 @@ class DiaryControllerTest(
                             LocalDateTime.of(2023, 4, 15, 9, 56, 33, 22233)
                         ),
                         DiaryContentPreview(
+                            1L,
                             "테스트 제목 2",
                             listOf(
                                 "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
@@ -195,6 +200,7 @@ class DiaryControllerTest(
                     ),
                     listOf(
                         DiaryContentPreview(
+                            1L,
                             "테스트 제목 3",
                             listOf(
                                 "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
@@ -205,6 +211,7 @@ class DiaryControllerTest(
                             LocalDateTime.of(2023, 4, 15, 9, 56, 33, 22233)
                         ),
                         DiaryContentPreview(
+                            1L,
                             "테스트 제목 4",
                             listOf(
                                 "https://mybucket.s3.amazonaws.com/images/photo1.jpg",

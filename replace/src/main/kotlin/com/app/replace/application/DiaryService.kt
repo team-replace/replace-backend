@@ -117,6 +117,7 @@ data class DiaryPreview(
 )
 
 data class DiaryContentPreview(
+    val id: Long,
     val title: String,
     val thumbnails: List<String>,
     val numOfExtraThumbnails: Int,
@@ -126,6 +127,7 @@ data class DiaryContentPreview(
         fun from(diary: Diary): DiaryContentPreview {
             val thumbnails = diary.imageURLs.map { url -> url.url }.toList()
             return DiaryContentPreview(
+                diary.id!!,
                 diary.title.title,
                 thumbnails.subList(0, 2),
                 if (3 < thumbnails.size) thumbnails.size - 3 else 0,
