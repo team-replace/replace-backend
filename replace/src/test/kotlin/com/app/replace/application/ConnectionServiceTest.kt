@@ -122,6 +122,14 @@ class ConnectionServiceTest(
             .extracting("code").isEqualTo(5001)
     }
 
+    @Test
+    fun `파트너와 연결되지 않은 회원의 파트너 ID를 찾으려 시도하면 null을 반환한다`(
+        @Autowired userService: UserService
+    ) {
+        val userId = `creates a User and returns id`(userService, "test@gmail.com", "test")
+        connectionService.findPartnerIdByUserId(userId) shouldBe null
+    }
+
     private fun `creates a User and returns id`(userService: UserService, email: String, nickname: String) =
         userService.createUser(email, "Password123!", nickname)
 

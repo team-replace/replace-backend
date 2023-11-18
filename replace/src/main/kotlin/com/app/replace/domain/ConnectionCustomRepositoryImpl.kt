@@ -2,6 +2,7 @@ package com.app.replace.domain
 
 import jakarta.persistence.EntityManager
 import org.springframework.stereotype.Repository
+import kotlin.jvm.optionals.getOrNull
 
 @Repository
 class ConnectionCustomRepositoryImpl(
@@ -40,6 +41,8 @@ class ConnectionCustomRepositoryImpl(
             Connection::class.java
         )
             .setParameter("userId", userId)
-            .singleResult
+            .resultStream
+            .findFirst()
+            .getOrNull()
     }
 }
