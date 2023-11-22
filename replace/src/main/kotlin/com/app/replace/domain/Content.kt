@@ -8,7 +8,7 @@ private const val CONTENT_MAX_LENGTH = 3000
 @Embeddable
 class Content(_content: String) {
 
-    @Column
+    @Column(length = 3000)
     val content: String
 
     init {

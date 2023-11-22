@@ -15,7 +15,8 @@ private const val BUCKET_URL_PREFIX = "https://replace-s3.s3.ap-northeast-2.amaz
 class S3ImageUploadManager(val s3Client: S3Client) : ImageUploadManager {
 
     override fun uploadImage(multipartFile: MultipartFile, imageName : String, imageCategory : ImageCategory): String {
-        val bucketKey = "${imageCategory.path}/${imageName}"
+        val extension = multipartFile.originalFilename?.substringAfter(".")
+        val bucketKey = "${imageCategory.path}/${imageName}.${extension}"
 
         val request = PutObjectRequest.builder()
             .bucket(BUCKET_NAME)
