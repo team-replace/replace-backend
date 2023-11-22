@@ -116,6 +116,8 @@ data class DiaryPreview(
     val contents: List<DiaryContentPreview>
 )
 
+private const val THUMBNAILS_MAX_SIZE = 3
+
 data class DiaryContentPreview(
     val id: Long,
     val title: String,
@@ -126,11 +128,21 @@ data class DiaryContentPreview(
     companion object {
         fun from(diary: Diary): DiaryContentPreview {
             val thumbnails = diary.imageURLs.map { url -> url.url }.toList()
+
+            if (thumbnails.size <= THUMBNAILS_MAX_SIZE) {
+                return DiaryContentPreview(
+                    diary.id!!,
+                    diary.title.title,
+                    thumbnails,
+                    0,
+                    diary.createdAt
+                )
+            }
             return DiaryContentPreview(
                 diary.id!!,
                 diary.title.title,
-                thumbnails.subList(0, 2),
-                if (3 < thumbnails.size) thumbnails.size - 3 else 0,
+                thumbnails.subList(0, THUMBNAILS_MAX_SIZE),
+                if (THUMBNAILS_MAX_SIZE < thumbnails.size) thumbnails.size - THUMBNAILS_MAX_SIZE else 0,
                 diary.createdAt
             )
         }
