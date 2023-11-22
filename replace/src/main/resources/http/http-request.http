@@ -8,14 +8,29 @@ GET http://localhost:8080/diarys?year=2021&month=6&day=12%20
 Content-Type: application/json
 temporary: pobi
 
-### 일기 저장하기
+### 일기 저장하기(썸네일 3개 이하)
 POST http://localhost:8080/diary
 Content-Type: application/json
-temporary: lisa
+temporary: pobi
+
+{
+  "images": ["https://img.freepik.com/premium-photo/a-cute-little-character-with-a-face-and-a-smile-on-his-face_902049-15707.jpg"],
+  "title": "안녕",
+  "content": "반가워여",
+  "shareScope": "ALL"
+}
+
+### 일기 저장하기(썸네일 3개 초과)
+POST http://localhost:8080/diary
+Content-Type: application/json
+temporary: pobi
 
 {
   "images": [
     "https://static.vecteezy.com/system/resources/previews/004/990/205/original/blue-whale-with-coral-in-the-sea-cute-cartoon-background-seamless-pattern-the-design-used-for-textile-clothing-pattern-print-wallpaper-illustration-vector.jpg",
+    "https://cdn3.vectorstock.com/i/1000x1000/95/27/seamless-whales-background-vector-20839527.jpg",
+    "https://cdn3.vectorstock.com/i/1000x1000/95/27/seamless-whales-background-vector-20839527.jpg",
+    "https://cdn3.vectorstock.com/i/1000x1000/95/27/seamless-whales-background-vector-20839527.jpg",
     "https://cdn3.vectorstock.com/i/1000x1000/95/27/seamless-whales-background-vector-20839527.jpg"
   ],
   "title" : "불꽃놀이와 함께한 오늘",
