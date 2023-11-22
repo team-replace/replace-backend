@@ -8,7 +8,7 @@ private const val TITLE_MAX_LENGTH = 30
 @Embeddable
 class Title(_title: String) {
 
-    @Column
+    @Column(length = 30)
     val title : String
 
     init {
