@@ -85,24 +85,31 @@ class DiaryService(
 
     @Transactional(readOnly = true)
     fun loadDiaries(userId: Long, date: LocalDate) : DiaryPreviews {
+        println("date = ${date}")
+        println("실행중인 메서드 : loadDiaries")
         if (date.isAfter(LocalDate.now())) {
             throw InvalidDateException()
         }
 
         val ids = mutableListOf(userId)
+        println("ids : ${ids}")
         val partnerId = connectionService.findPartnerIdByUserId(userId)
+        println("partnerId = ${partnerId}")
         if (partnerId != null) ids.add(partnerId)
 
         val diaryPreviews = ids.map { id -> loadDiaryPreviews(id) }.toList()
+        println("diaryPreviews = ${diaryPreviews}")
         return DiaryPreviews(diaryPreviews)
     }
 
     private fun loadDiaryPreviews(id: Long): DiaryPreview {
         val (nickname, imageUrl) = userService.loadSimpleUserInformationById(id)
         val writer = Writer(imageUrl, nickname)
+        println("writer = ${writer}")
         val contents =
             diaryRepository.findByUserIdOrderByCreatedAtDesc(id)
                 .map(DiaryContentPreview.Companion::from).toList()
+        println("contents = ${contents}")
         return DiaryPreview(writer, contents)
     }
 }
