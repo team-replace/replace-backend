@@ -93,15 +93,19 @@ class DiaryService(
         val partnerId = connectionService.findPartnerIdByUserId(userId)
         if (partnerId != null) ids.add(partnerId)
 
-        val diaryPreviews = ids.map { id -> loadDiaryPreviews(id) }.toList()
+        val diaryPreviews = ids.map { id -> loadDiaryPreviews(id, date) }.toList()
         return DiaryPreviews(diaryPreviews)
     }
 
-    private fun loadDiaryPreviews(id: Long): DiaryPreview {
+    private fun loadDiaryPreviews(id: Long, date: LocalDate): DiaryPreview {
         val (nickname, imageUrl) = userService.loadSimpleUserInformationById(id)
         val writer = Writer(imageUrl, nickname)
         val contents =
-            diaryRepository.findByUserIdOrderByCreatedAtDesc(id)
+            diaryRepository.findByUserIdAndCreatedAtBetweenOrderByCreatedAtDesc(
+                id,
+                date.atStartOfDay(),
+                date.plusDays(1).atStartOfDay()
+            )
                 .map(DiaryContentPreview.Companion::from).toList()
         return DiaryPreview(writer, contents)
     }
