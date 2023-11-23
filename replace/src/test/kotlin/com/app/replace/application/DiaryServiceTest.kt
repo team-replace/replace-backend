@@ -1,11 +1,9 @@
 package com.app.replace.application
 
-import com.app.replace.domain.Content
-import com.app.replace.domain.DiaryRepository
-import com.app.replace.domain.ShareScope
-import com.app.replace.domain.Title
+import com.app.replace.domain.*
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.date.shouldHaveSameDayAs
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import jakarta.persistence.EntityManager
@@ -21,6 +19,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @DataJpaTest
 @Import(DiaryService::class)
@@ -41,6 +40,11 @@ class DiaryServiceTest(
     fun init() {
         every { userService.loadSimpleUserInformationById(1L) } returns SimpleUserInformation(
             "케로",
+            "https://my-s3-bucket.s3.eu-central-1.amazonaws.com"
+        )
+
+        every { userService.loadSimpleUserInformationById(2L) } returns SimpleUserInformation(
+            "말랑",
             "https://my-s3-bucket.s3.eu-central-1.amazonaws.com"
         )
     }
@@ -218,11 +222,6 @@ class DiaryServiceTest(
 
     @Test
     fun `커플 연결이 되었을 경우 내 일기 파트너 일기 순서대로 보여준다`() {
-        every { userService.loadSimpleUserInformationById(2L) } returns SimpleUserInformation(
-            "말랑",
-            "https://my-s3-bucket.s3.eu-central-1.amazonaws.com"
-        )
-
         `create a diary and return id`(1L)
         `create a diary and return id`(1L)
         `create a diary and return id`(2L)
@@ -245,6 +244,104 @@ class DiaryServiceTest(
             .isInstanceOf(InvalidDateException::class.java)
             .hasMessage("선택할 수 없는 날짜입니다.")
             .extracting("code").isEqualTo(7000)
+    }
+
+    @Test
+    fun `지정한 날짜에 작성한 일기장의 목록을 보여준다`() {
+        every { connectionService.findPartnerIdByUserId(1L) } returns 2L
+
+        // Given : 10월 23일의 일기
+        diaryRepository.save(
+            Diary(
+                Title("10월 23일의 일기"),
+                Content("안녕하세요! 오늘은 정말 즐거운 하루였어요. 아침에 일어나서 창밖으로 보니 예쁜 태양이 떠 있었어요. 하늘에는 하얀 구름들이 자유롭게 떠다니고 있었어요. 아침 식사 후에는 학교에 가는 길에 나무 아래에 떨어진 도토리를 발견했어요. 도토리를 주머니에 담아가면 선생님께 보여주면 좋은 일이 생길 거라고 친구가 말해줬어요. 그래서 기뻐서 도토리를 주머니에 넣고 학교에 갔어요. 학교에서는 새로운 친구들을 만났어요. 함께 놀이 시간에는 공원에서 즐거운 시간을 보냈어요. 미끄럼틀에서 미끄러져 내려가면서 웃음 소리가 가득했어요. 그리고 친구들과 함께 길게 뛰어놀면서 에너지를 다 쏟아냈어요. 점심 시간에는 제가 좋아하는 치킨과 샐러드를 먹었어요. 배가 부르게 먹고 나니 행복한 기분이 느껴졌어요. 그리고 수업 시간에는 새로운 것을 배우면서 더 똑똑해지고 있다는 느낌이 들었어요. 저녁에는 가족과 함께 맛있는 저녁을 먹었어요. 엄마가 만든 김치찌개는 정말 맛있었어요. 식탁에서 가족들끼리 이야기를 나누면서 하루를 마무리했어요. 이렇게 특별한 하루를 일기에 담아보았어요. 내일도 좋은 일이 가득하길 기대해봐야겠어요. 안녕!"),
+                Place("TimeSquare", "Times Square, New York, NY 10036"),
+                listOf(
+                    ImageURL("https://mybucket.s3.amazonaws.com/images/photo1.jpg"),
+                    ImageURL("https://s3-us-west-2.amazonaws.com/mybucket/images/pic2.png"),
+                    ImageURL("https://my-s3-bucket.s3.eu-central-1.amazonaws.com/photos/image3.jpg")
+                ),
+                1L,
+                ShareScope.US,
+                LocalDateTime.of(2023, 10, 23, 5, 23, 30, 334232)
+            )
+        )
+        // Given : 10월 23일에 쓴 파트너의 일기
+        diaryRepository.save(
+            Diary(
+                Title("10월 23일, 특별한 하루"),
+                Content("오늘은 정말 특별한 하루였어요. 아침에 일어나서 창문을 열어보니 시원한 바람이 불면서 가을의 냄새가 나서 기분이 좋았어요. 연인과 함께하는 하루는 항상 특별한데, 오늘은 더욱 그런 날이었어요. 함께한 아침 식사는 따뜻한 커피와 맛있는 먹거리로 가득했어요. 서로 이야기를 나누면서 웃음 소리가 가득했죠. 날씨가 좋아서 나들이를 가기로 했어요. 함께 거닐면서는 가을의 단풍이 우리를 반긴 것 같았어요. 손을 맞잡고 산책하면서 서로에게 소소한 이야기를 나누는 것이 행복했어요. 점심은 우리가 좋아하는 음식점에서 함께한 시간이었어요. 맛있는 음식과 함께하는 대화는 언제나 특별하게 느껴져요. 서로의 이야기를 듣고 나니 더 가까워진 것 같아 기쁘기도 했어요. 오후에는 함께 영화를 보기로 했어요. 어떤 영화를 볼지 고르는 것부터가 즐거웠어요. 영화 속에서 감정을 나누면서, 언제나 함께 있는 것이 행복하다는 생각이 들었어요. 하루를 마무리할 때, 함께 보낸 소중한 시간에 감사함을 느꼈어요. 이런 특별한 순간들이 계속되길 기대하면서, 오늘 같은 날을 다시 만들고 싶어졌어요. 내일이 더 기대돼요. 사랑해."),
+                Place("TimeSquare", "Times Square, New York, NY 10036"),
+                listOf(
+                    ImageURL("https://mybucket.s3.amazonaws.com/images/photo1.jpg"),
+                    ImageURL("https://s3-us-west-2.amazonaws.com/mybucket/images/pic2.png"),
+                    ImageURL("https://my-s3-bucket.s3.eu-central-1.amazonaws.com/photos/image3.jpg")
+                ),
+                2L,
+                ShareScope.US,
+                LocalDateTime.of(2023, 10, 23, 23, 10, 13, 8739)
+            )
+        )
+
+        // When
+        val diaries = diaryService.loadDiaries(1L, LocalDate.of(2023, 10, 23))
+
+        // Then
+        val userDiaries = diaries.diaries.get(0)
+        userDiaries.contents shouldHaveSize 1
+        userDiaries.contents.get(0).createdAt.toLocalDate() shouldHaveSameDayAs LocalDate.of(2023, 10, 23)
+
+        val partnerDiaries = diaries.diaries.get(1)
+        partnerDiaries.contents shouldHaveSize 1
+        partnerDiaries.contents.get(0).createdAt.toLocalDate() shouldHaveSameDayAs LocalDate.of(2023, 10, 23)
+    }
+
+    @Test
+    fun `지정한 날짜에 작성하지 않은 일기장은 보여주지 않는다`() {
+        every { connectionService.findPartnerIdByUserId(1L) } returns 2L
+
+        // Given : 10월 23일의 일기
+        diaryRepository.save(
+            Diary(
+                Title("10월 23일의 일기"),
+                Content("안녕하세요! 오늘은 정말 즐거운 하루였어요. 아침에 일어나서 창밖으로 보니 예쁜 태양이 떠 있었어요. 하늘에는 하얀 구름들이 자유롭게 떠다니고 있었어요. 아침 식사 후에는 학교에 가는 길에 나무 아래에 떨어진 도토리를 발견했어요. 도토리를 주머니에 담아가면 선생님께 보여주면 좋은 일이 생길 거라고 친구가 말해줬어요. 그래서 기뻐서 도토리를 주머니에 넣고 학교에 갔어요. 학교에서는 새로운 친구들을 만났어요. 함께 놀이 시간에는 공원에서 즐거운 시간을 보냈어요. 미끄럼틀에서 미끄러져 내려가면서 웃음 소리가 가득했어요. 그리고 친구들과 함께 길게 뛰어놀면서 에너지를 다 쏟아냈어요. 점심 시간에는 제가 좋아하는 치킨과 샐러드를 먹었어요. 배가 부르게 먹고 나니 행복한 기분이 느껴졌어요. 그리고 수업 시간에는 새로운 것을 배우면서 더 똑똑해지고 있다는 느낌이 들었어요. 저녁에는 가족과 함께 맛있는 저녁을 먹었어요. 엄마가 만든 김치찌개는 정말 맛있었어요. 식탁에서 가족들끼리 이야기를 나누면서 하루를 마무리했어요. 이렇게 특별한 하루를 일기에 담아보았어요. 내일도 좋은 일이 가득하길 기대해봐야겠어요. 안녕!"),
+                Place("TimeSquare", "Times Square, New York, NY 10036"),
+                listOf(
+                    ImageURL("https://mybucket.s3.amazonaws.com/images/photo1.jpg"),
+                    ImageURL("https://s3-us-west-2.amazonaws.com/mybucket/images/pic2.png"),
+                    ImageURL("https://my-s3-bucket.s3.eu-central-1.amazonaws.com/photos/image3.jpg")
+                ),
+                1L,
+                ShareScope.US,
+                LocalDateTime.of(2023, 10, 23, 5, 23, 30, 334232)
+            )
+        )
+        // Given : 10월 23일에 쓴 파트너의 일기
+        diaryRepository.save(
+            Diary(
+                Title("10월 23일, 특별한 하루"),
+                Content("오늘은 정말 특별한 하루였어요. 아침에 일어나서 창문을 열어보니 시원한 바람이 불면서 가을의 냄새가 나서 기분이 좋았어요. 연인과 함께하는 하루는 항상 특별한데, 오늘은 더욱 그런 날이었어요. 함께한 아침 식사는 따뜻한 커피와 맛있는 먹거리로 가득했어요. 서로 이야기를 나누면서 웃음 소리가 가득했죠. 날씨가 좋아서 나들이를 가기로 했어요. 함께 거닐면서는 가을의 단풍이 우리를 반긴 것 같았어요. 손을 맞잡고 산책하면서 서로에게 소소한 이야기를 나누는 것이 행복했어요. 점심은 우리가 좋아하는 음식점에서 함께한 시간이었어요. 맛있는 음식과 함께하는 대화는 언제나 특별하게 느껴져요. 서로의 이야기를 듣고 나니 더 가까워진 것 같아 기쁘기도 했어요. 오후에는 함께 영화를 보기로 했어요. 어떤 영화를 볼지 고르는 것부터가 즐거웠어요. 영화 속에서 감정을 나누면서, 언제나 함께 있는 것이 행복하다는 생각이 들었어요. 하루를 마무리할 때, 함께 보낸 소중한 시간에 감사함을 느꼈어요. 이런 특별한 순간들이 계속되길 기대하면서, 오늘 같은 날을 다시 만들고 싶어졌어요. 내일이 더 기대돼요. 사랑해."),
+                Place("TimeSquare", "Times Square, New York, NY 10036"),
+                listOf(
+                    ImageURL("https://mybucket.s3.amazonaws.com/images/photo1.jpg"),
+                    ImageURL("https://s3-us-west-2.amazonaws.com/mybucket/images/pic2.png"),
+                    ImageURL("https://my-s3-bucket.s3.eu-central-1.amazonaws.com/photos/image3.jpg")
+                ),
+                2L,
+                ShareScope.US,
+                LocalDateTime.of(2023, 10, 23, 23, 10, 13, 8739)
+            )
+        )
+
+        // When
+        val diaries = diaryService.loadDiaries(1L, LocalDate.of(2023, 10, 22))
+
+        // Then
+        val userDiaries = diaries.diaries.get(0)
+        userDiaries.contents shouldHaveSize 0
+
+        val partnerDiaries = diaries.diaries.get(1)
+        partnerDiaries.contents shouldHaveSize 0
     }
 
     private fun `create a diary and return id`(userId: Long): Long {

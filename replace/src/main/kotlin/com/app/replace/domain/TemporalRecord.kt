@@ -10,11 +10,9 @@ import java.time.LocalDateTime
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
-abstract class TemporalRecord {
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    var createdAt: LocalDateTime = LocalDateTime.MIN
-
+abstract class TemporalRecord(
+    @CreatedDate @Column(nullable = false, updatable = false) open var createdAt: LocalDateTime = LocalDateTime.MIN
+) {
     @LastModifiedDate
     @Column(nullable = false)
     var modifiedAt: LocalDateTime = LocalDateTime.MIN

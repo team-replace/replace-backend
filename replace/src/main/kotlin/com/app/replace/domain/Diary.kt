@@ -12,7 +12,7 @@ class Diary(
     var userId: Long?,
     @Enumerated(EnumType.STRING)
     var shareScope: ShareScope,
-    override var createdAt: LocalDateTime = LocalDateTime.MIN
+    override var createdAt: LocalDateTime = LocalDateTime.now()
 ) : TemporalRecord(createdAt) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
