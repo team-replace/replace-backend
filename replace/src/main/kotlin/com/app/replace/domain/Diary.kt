@@ -1,6 +1,7 @@
 package com.app.replace.domain
 
 import jakarta.persistence.*
+import java.time.LocalDateTime
 
 @Entity
 class Diary(
@@ -10,8 +11,9 @@ class Diary(
     imageURLs: List<ImageURL>,
     var userId: Long?,
     @Enumerated(EnumType.STRING)
-    var shareScope: ShareScope
-) : TemporalRecord() {
+    var shareScope: ShareScope,
+    override var createdAt: LocalDateTime = LocalDateTime.MIN
+) : TemporalRecord(createdAt) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long?
@@ -59,5 +61,4 @@ class Diary(
         }
         return additionalImageURLs
     }
-
 }
