@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.Delete
+import software.amazon.awssdk.services.s3.model.DeleteObjectsRequest
+import software.amazon.awssdk.services.s3.model.ObjectIdentifier
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 
 private const val BUCKET_NAME = "replace-s3"
@@ -34,5 +37,21 @@ class S3ImageUploadManager(val s3Client: S3Client) : ImageUploadManager {
             .path
         requireNotNull(path) { "저장된 이미지의 URL이 존재하지 않습니다."}
         return BUCKET_URL_PREFIX + path
+    }
+
+    override fun removeAll(urls: List<String>) {
+        val keyNames = urls
+            .map { url -> getKeyName(url) }
+            .map { key -> ObjectIdentifier.builder().key(key).build() }
+            .toList()
+
+        s3Client.deleteObjects(DeleteObjectsRequest.builder()
+            .bucket(BUCKET_NAME)
+            .delete(Delete.builder().objects(keyNames).build())
+            .build())
+    }
+
+    private fun getKeyName(url: String): String {
+        return url.replace("$BUCKET_URL_PREFIX/", "")
     }
 }
