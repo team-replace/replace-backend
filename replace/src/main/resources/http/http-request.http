@@ -51,3 +51,13 @@ temporary: lisa
 {
   "code": "8067bf6506"
 }
+
+### KAKAO MAP 주소 찾기
+GET https://dapi.kakao.com/v2/local/geo/coord2address.json?x=127.055047377755&y=37.2368405729005
+Content-Type: application/json
+Authorization: KakaoAK ${kakao_rest_api_key}
+
+### KAKAO MAP 좌표 찾기
+GET https://dapi.kakao.com/v2/local/search/address.json?query=경기 수원시 영통구 망포동 688-2
+Content-Type: application/json
+Authorization: KakaoAK ${kakao_rest_api_key}
