@@ -1,11 +1,16 @@
 package com.app.replace.ui
 
-import com.app.replace.application.*
+import com.app.replace.application.AUTHENTICATION_HEADER_NAME
+import com.app.replace.application.ConnectionService
+import com.app.replace.application.exception.CannotReconnectException
+import com.app.replace.application.exception.ConnectionCodeNotFoundException
+import com.app.replace.application.exception.PartnerAlreadyHavingConnectionException
+import com.app.replace.application.exception.UserAlreadyHavingConnectionException
+import com.app.replace.ui.request.MakingConnectionRequest
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.just
 import io.mockk.runs
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc

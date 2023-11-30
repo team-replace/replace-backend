@@ -1,12 +1,12 @@
 package com.app.replace.application
 
-import com.app.replace.common.exception.BadRequestException
+import com.app.replace.application.exception.*
 import com.app.replace.domai.ConnectionRepository
 import com.app.replace.domain.Connection
 import com.app.replace.domain.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.Objects
+import java.util.*
 
 @Service
 @Transactional
@@ -73,8 +73,3 @@ class ConnectionService(
     }
 }
 
-class ConnectionCodeNotFoundException(override val message: String? = "존재하지 않는 코드입니다.") : BadRequestException(5000)
-class CannotReconnectException(override val message: String? = "다시 연결할 수 없는 코드입니다.") : BadRequestException(5001)
-class PartnerAlreadyHavingConnectionException(override val message: String? = "이미 다른 사람과 연결된 코드입니다.") : BadRequestException(5002)
-class UserAlreadyHavingConnectionException(override val message: String? = "귀하의 계정이 이미 다른 사람과 연결되어 있습니다.") : BadRequestException(5003)
-class ConnectingWithItSelfException(override val message: String? = "자기 자신과 연결할 수 없습니다.") : BadRequestException(5004)

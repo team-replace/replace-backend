@@ -1,9 +1,9 @@
 package com.app.replace.application
 
+import com.app.replace.application.request.ImageUploadingRequest
 import com.app.replace.domain.ImageURLRepository
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
-import org.springframework.web.multipart.MultipartFile
 
 @Service
 class ImageService(
@@ -30,9 +30,3 @@ class ImageService(
         imageURLRepository.deleteAllInBatch(unusedImages)
     }
 }
-
-data class ImageUploadingRequest(
-    val multipartFile: MultipartFile,
-    val imageName: String,
-    val imageCategory: ImageCategory
-)

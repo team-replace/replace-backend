@@ -1,14 +1,16 @@
 package com.app.replace.ui
 
-import com.app.replace.application.DiaryPreviews
 import com.app.replace.application.DiaryService
-import com.app.replace.application.SingleDiaryRecord
+import com.app.replace.application.response.DiaryPreviews
+import com.app.replace.application.response.SingleDiaryRecord
 import com.app.replace.ui.argumentresolver.Authenticated
+import com.app.replace.ui.request.CreateDiaryRequest
+import com.app.replace.ui.request.ImageUploadingRequest
+import com.app.replace.ui.response.ImageUploadingResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.multipart.MultipartFile
 import java.net.URI
 import java.time.LocalDate
 
@@ -87,7 +89,3 @@ class DiaryController(val diaryService: DiaryService) {
     }
 }
 
-data class CreateDiaryRequest(val title: String, val content: String, val shareScope: String, val images: List<String>)
-
-data class ImageUploadingRequest(val images: List<MultipartFile>)
-data class ImageUploadingResponse(val imageUrls: List<String>)

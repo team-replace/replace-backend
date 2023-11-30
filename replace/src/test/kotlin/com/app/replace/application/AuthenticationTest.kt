@@ -1,9 +1,12 @@
 package com.app.replace.application
 
+import com.app.replace.application.response.ImageURLRecord
+import com.app.replace.application.response.SingleDiaryRecord
+import com.app.replace.application.response.Writer
 import com.app.replace.domain.Content
 import com.app.replace.domain.Place
 import com.app.replace.domain.Title
-import com.app.replace.ui.CreateDiaryRequest
+import com.app.replace.ui.request.CreateDiaryRequest
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.matchers.shouldBe

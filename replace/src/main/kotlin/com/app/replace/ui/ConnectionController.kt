@@ -2,15 +2,10 @@ package com.app.replace.ui
 
 import com.app.replace.application.ConnectionService
 import com.app.replace.ui.argumentresolver.Authenticated
-import org.springframework.http.HttpStatus
+import com.app.replace.ui.request.MakingConnectionRequest
+import com.app.replace.ui.response.LoadingSingleConnectionCodeResponse
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/connection")
@@ -37,5 +32,3 @@ class ConnectionController(
     }
 }
 
-data class MakingConnectionRequest(val code: String)
-data class LoadingSingleConnectionCodeResponse(val code : String)

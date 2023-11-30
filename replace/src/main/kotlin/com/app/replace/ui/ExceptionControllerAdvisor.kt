@@ -2,6 +2,7 @@ package com.app.replace.ui
 
 import com.app.replace.common.exception.BadRequestException
 import com.app.replace.ui.exception.UnAuthenticatedException
+import com.app.replace.ui.response.CommonExceptionFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -27,4 +28,3 @@ class ExceptionControllerAdvisor {
     }
 }
 
-data class CommonExceptionFormat(val errorCode: Int, val errorBody: String)
