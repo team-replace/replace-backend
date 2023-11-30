@@ -18,14 +18,22 @@ class DiaryService(
     private val diaryRepository : DiaryRepository,
     private val connectionService: ConnectionService,
     private val userService: UserService,
-    private val imageService: ImageService
+    private val imageService: ImageService,
+    private val placeFinder: PlaceFinder
 ) {
-    fun createDiary(userId: Long, title: String, content: String, shareScope: String, imageURLs: List<String>): Long {
+    fun createDiary(
+        userId: Long,
+        title: String,
+        content: String,
+        shareScope: String,
+        coordinate: Coordinate,
+        imageURLs: List<String>
+    ): Long {
         val diary = diaryRepository.save(
             Diary(
                 Title(title),
                 Content(content),
-                Place("루터회관", "서울 송파구 올림픽로35다길 42"), // FIXME : 요청에서 장소 정보를 받도록 수정해야 한다
+                coordinate,
                 ImageURL.from(imageURLs),
                 userId,
                 ShareScope.valueOf(shareScope)
@@ -40,6 +48,7 @@ class DiaryService(
         title: String,
         content: String,
         shareScope: String,
+        coordinate: Coordinate,
         imageURLs: List<String>
     ) {
         val diary =
@@ -49,7 +58,7 @@ class DiaryService(
             Diary(
                 Title(title),
                 Content(content),
-                Place("루터회관", "서울 송파구 올림픽로35다길 42"), // FIXME : 요청에서 장소 정보를 받도록 수정해야 한다
+                coordinate,
                 ImageURL.from(imageURLs),
                 userId,
                 ShareScope.valueOf(shareScope)
@@ -67,7 +76,7 @@ class DiaryService(
         val user = userService.loadSimpleUserInformationById(
             diary.userId ?: throw IllegalArgumentException("작성자 정보가 존재하지 않습니다.")
         )
-        return SingleDiaryRecord.from(diary, user)
+        return SingleDiaryRecord.from(diary, user, placeFinder)
     }
 
     fun uploadImages(images: List<MultipartFile>) : List<String> {

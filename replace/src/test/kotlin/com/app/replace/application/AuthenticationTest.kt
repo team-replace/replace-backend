@@ -4,6 +4,7 @@ import com.app.replace.application.response.ImageURLRecord
 import com.app.replace.application.response.SingleDiaryRecord
 import com.app.replace.application.response.Writer
 import com.app.replace.domain.Content
+import com.app.replace.domain.Coordinate
 import com.app.replace.domain.Place
 import com.app.replace.domain.Title
 import com.app.replace.ui.request.CreateDiaryRequest
@@ -25,6 +26,7 @@ import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.transaction.annotation.Transactional
+import java.math.BigDecimal
 import java.time.LocalDateTime
 
 @Transactional
@@ -49,6 +51,7 @@ class AuthenticationTest(
                 "케로의 일기",
                 "케로는 이리내와 나란히 햄버거를 먹었다. 햄버거가 생각보다 맛있어 케로 혼자 4개를 먹었다.",
                 "US",
+                Coordinate(BigDecimal("127.103068896795"), BigDecimal("37.5152535228382")),
                 listOf(
                     "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
                     "https://s3-us-west-2.amazonaws.com/mybucket/images/pic2.png",
@@ -81,6 +84,7 @@ class AuthenticationTest(
                 "케로의 일기",
                 "케로는 이리내와 나란히 햄버거를 먹었다. 햄버거가 생각보다 맛있어 케로 혼자 4개를 먹었다.",
                 "US",
+                Coordinate(BigDecimal("127.103068896795"), BigDecimal("37.5152535228382")),
                 listOf(
                     "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
                     "https://s3-us-west-2.amazonaws.com/mybucket/images/pic2.png",
@@ -133,6 +137,7 @@ class AuthenticationTest(
             "케로의 일기",
             "케로는 이리내와 나란히 햄버거를 먹었다. 햄버거가 생각보다 맛있어 케로 혼자 4개를 먹었다.",
             "US",
+            Coordinate(BigDecimal("127.103068896795"), BigDecimal("37.5152535228382")),
             listOf(
                 "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
                 "https://s3-us-west-2.amazonaws.com/mybucket/images/pic2.png",

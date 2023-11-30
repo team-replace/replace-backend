@@ -27,6 +27,7 @@ class DiaryController(val diaryService: DiaryService) {
             createDiaryRequest.title,
             createDiaryRequest.content,
             createDiaryRequest.shareScope,
+            createDiaryRequest.coordinate,
             createDiaryRequest.images
         )
 
@@ -64,6 +65,7 @@ class DiaryController(val diaryService: DiaryService) {
             createDiaryRequest.title,
             createDiaryRequest.content,
             createDiaryRequest.shareScope,
+            createDiaryRequest.coordinate,
             createDiaryRequest.images
         )
     }

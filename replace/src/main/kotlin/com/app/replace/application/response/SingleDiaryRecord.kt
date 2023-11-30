@@ -1,5 +1,6 @@
 package com.app.replace.application.response
 
+import com.app.replace.application.PlaceFinder
 import com.app.replace.domain.Content
 import com.app.replace.domain.Diary
 import com.app.replace.domain.Place
@@ -16,13 +17,13 @@ data class SingleDiaryRecord(
     @JsonUnwrapped val content: Content
 ) {
     companion object {
-        fun from(diary: Diary, user: SimpleUserInformation): SingleDiaryRecord {
+        fun from(diary: Diary, user: SimpleUserInformation, placeFinder: PlaceFinder): SingleDiaryRecord {
             return SingleDiaryRecord(
                 diary.id ?: throw IllegalArgumentException("식별자가 존재하지 않는 일기장을 응답할 수 없습니다."),
                 diary.imageURLs
                     .map { imageURL -> ImageURLRecord(imageURL.url) }
                     .toList(),
-                diary.place,
+                placeFinder.findPlaceByCoordinate(diary.coordinate),
                 diary.createdAt.toString(),
                 Writer(user.imageUrl, user.nickname),
                 diary.title,
