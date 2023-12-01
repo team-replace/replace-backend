@@ -85,7 +85,14 @@ GET https://dapi.kakao.com/v2/local/geo/coord2address.json?x=127.055047377755&y=
 Content-Type: application/json
 Authorization: KakaoAK ${kakao_rest_api_key}
 
-### KAKAO MAP 좌표 찾기
+### KAKAO MAP 정확한 주소로 좌표 찾기
 GET https://dapi.kakao.com/v2/local/search/address.json?query=경기 수원시 영통구 망포동 688-2
 Content-Type: application/json
 Authorization: KakaoAK ${kakao_rest_api_key}
+
+### KAKAO MAP 키워드로 좌표 찾기
+GET https://dapi.kakao.com/v2/local/search/keyword.json?query=루터회관&x=127.10023101886318&y=37.51331105877401&page=1&size=10&sort=accuracy
+Content-Type: application/json
+Authorization: KakaoAK ${kakao_rest_api_key}
+
+# ${kakao_rest_api_key}는 실제 key로 바꾸어주어야 테스트할 수 있습니다.

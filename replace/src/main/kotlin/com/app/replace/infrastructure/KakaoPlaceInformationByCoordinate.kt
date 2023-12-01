@@ -3,7 +3,7 @@ package com.app.replace.infrastructure
 import com.app.replace.application.exception.IllegalCoordinateException
 import com.app.replace.application.exception.NotBuildingPointException
 
-data class KakaoPlaceInformation(
+data class KakaoPlaceInformationByCoordinate(
     val meta: LinkedHashMap<String, Int>,
     val documents: ArrayList<LinkedHashMap<String, LinkedHashMap<String, String>>>
 ) {
@@ -14,7 +14,7 @@ data class KakaoPlaceInformation(
         return roadAddress.get("building_name") ?: throw NotBuildingPointException()
     }
 
-    fun getRodaAddressName() : String {
+    fun getRoadAddressName() : String {
         val roadAddress: LinkedHashMap<String, String> = getRoadAddress()
         return roadAddress.get("address_name") ?: throw NotBuildingPointException()
     }
