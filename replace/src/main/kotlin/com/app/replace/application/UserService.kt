@@ -1,5 +1,6 @@
 package com.app.replace.application
 
+import com.app.replace.application.response.*
 import com.app.replace.domain.CODE_MAX_LENGTH
 import com.app.replace.domain.User
 import com.app.replace.domain.UserRepository
@@ -49,19 +50,4 @@ class UserService(
         return AloneUserInformation(SimpleUserProfile(user.nickname, "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png"))
     }
 }
-
-data class SimpleUserInformation(val nickname: String, val imageUrl: String)
-
-data class SimpleUserProfile(val nickname: String, val profileImage: String)
-
-abstract class UserInformation {
-    abstract val user: SimpleUserProfile
-}
-
-data class AloneUserInformation(override val user: SimpleUserProfile) : UserInformation()
-
-data class UserInformationWithPartner(
-    override val user: SimpleUserProfile,
-    val partner: SimpleUserProfile
-) : UserInformation()
 

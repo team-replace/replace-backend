@@ -4,7 +4,7 @@ Content-Type: application/json
 temporary: pobi
 
 ### 우리의 일기장 조회하기
-GET http://localhost:8080/diarys?year=2021&month=6&day=12%20
+GET http://localhost:8080/diarys?year=2023&month=11&day=30%20
 Content-Type: application/json
 temporary: pobi
 
@@ -17,7 +17,11 @@ temporary: pobi
   "images": ["https://img.freepik.com/premium-photo/a-cute-little-character-with-a-face-and-a-smile-on-his-face_902049-15707.jpg"],
   "title": "안녕",
   "content": "반가워여",
-  "shareScope": "ALL"
+  "shareScope": "ALL",
+  "coordinate": {
+    "longitude": 127.055047377755,
+    "latitude": 37.2368405729005
+  }
 }
 
 ### 일기 저장하기(썸네일 3개 초과)
@@ -35,8 +39,32 @@ temporary: pobi
   ],
   "title" : "불꽃놀이와 함께한 오늘",
   "content": "안녕 일기야,\n\n오늘은 정말 즐거운 하루였어. 아침에 일어나서 창 밖으로 보니 하늘에는 맑은 햇살이 비치고 있었어. 하루를 시작하는데 더할 나위 없이 좋은 날이었다. 학교에 가는 길에는 가을이 도착한 듯이 나무들이 아름다운 빨간, 노란, 갈색 잎사귀로 가득해져 있었어.\n\n수업은 예상대로 지루하지만, 오늘은 점심시간에 친구들과 함께 놀러 나갔어. 학교 근처에 있는 공원에서 불꽃놀이 대회가 열리고 있었거든. 그래서 우리는 맛있는 도시락을 들고 공원으로 향했어.\n\n공원에 도착하자마자 화려한 불꽃놀이가 펼쳐졌어. 하늘에는 다양한 색상의 불빛이 춤을 추며 피어나고, 우리는 그 아름다운 광경에 환호와 함성을 지르면서 여유로운 시간을 보냈어. 불꽃놀이의 아름다움 속에서 어깨를 나란히 하고, 친구들과 함께 있는 특별한 순간들이 내 마음을 행복하게 만들었어.\n\n불꽃놀이가 끝난 후에는 주변에 있는 음악이 울려퍼져 우리는 춤추고 노래를 부르며 즐거운 시간을 보냈어. 이렇게 활기찬 하루를 보내니까 마음도 가벼워지고 에너지가 충전된 것 같아.\n\n집에 돌아오는 길에는 뭔가 새로운 도전을 시작할 용기를 얻은 것 같아. 오늘의 경험은 나에게 즐거움과 동시에 새로운 도전을 향한 열정을 심어주었어. 이런 특별한 순간들을 기억하며 내일도 활기차게 살아보려 해.\n\n잘자, 내일도 기대돼!\n\n(당신의 이름)",
+  "shareScope": "US",
+  "coordinate": {
+    "longitude": 127.055047377755,
+    "latitude": 37.2368405729005
+  }
+}
+
+### 일기장 수정하기
+PUT http://localhost:8080/diary/1
+Content-Type: application/json
+temporary: pobi
+
+{
+  "images": [
+    "https://static.vecteezy.com/system/resources/previews/004/990/205/original/blue-whale-with-coral-in-the-sea-cute-cartoon-background-seamless-pattern-the-design-used-for-textile-clothing-pattern-print-wallpaper-illustration-vector.jpg",
+    "https://cdn3.vectorstock.com/i/1000x1000/95/27/seamless-whales-background-vector-20839527.jpg"
+  ],
+  "title" : "안녕 나는 수정한 일기장",
+  "content": "안녕 일기야,\n\n오늘은 정말 즐거운 하루였어. 아침에 일어나서 창 밖으로 보니 하늘에는 맑은 햇살이 비치고 있었어. 하루를 시작하는데 더할 나위 없이 좋은 날이었다. 학교에 가는 길에는 가을이 도착한 듯이 나무들이 아름다운 빨간, 노란, 갈색 잎사귀로 가득해져 있었어.\n\n수업은 예상대로 지루하지만, 오늘은 점심시간에 친구들과 함께 놀러 나갔어. 학교 근처에 있는 공원에서 불꽃놀이 대회가 열리고 있었거든. 그래서 우리는 맛있는 도시락을 들고 공원으로 향했어.\n\n공원에 도착하자마자 화려한 불꽃놀이가 펼쳐졌어. 하늘에는 다양한 색상의 불빛이 춤을 추며 피어나고, 우리는 그 아름다운 광경에 환호와 함성을 지르면서 여유로운 시간을 보냈어. 불꽃놀이의 아름다움 속에서 어깨를 나란히 하고, 친구들과 함께 있는 특별한 순간들이 내 마음을 행복하게 만들었어.\n\n불꽃놀이가 끝난 후에는 주변에 있는 음악이 울려퍼져 우리는 춤추고 노래를 부르며 즐거운 시간을 보냈어. 이렇게 활기찬 하루를 보내니까 마음도 가벼워지고 에너지가 충전된 것 같아.\n\n집에 돌아오는 길에는 뭔가 새로운 도전을 시작할 용기를 얻은 것 같아. 오늘의 경험은 나에게 즐거움과 동시에 새로운 도전을 향한 열정을 심어주었어. 이런 특별한 순간들을 기억하며 내일도 활기차게 살아보려 해.\n\n잘자, 내일도 기대돼!\n\n(당신의 이름)",
   "shareScope": "US"
 }
+
+### 단건 일기장 상세보기
+GET http://localhost:8080/diary/1
+Content-Type: application/json
+temporary: pobi
 
 ### 커플 코드 확인하기
 GET http://localhost:8080/connection/code
@@ -51,3 +79,13 @@ temporary: lisa
 {
   "code": "8067bf6506"
 }
+
+### KAKAO MAP 주소 찾기
+GET https://dapi.kakao.com/v2/local/geo/coord2address.json?x=127.055047377755&y=37.2368405729005
+Content-Type: application/json
+Authorization: KakaoAK ${kakao_rest_api_key}
+
+### KAKAO MAP 좌표 찾기
+GET https://dapi.kakao.com/v2/local/search/address.json?query=경기 수원시 영통구 망포동 688-2
+Content-Type: application/json
+Authorization: KakaoAK ${kakao_rest_api_key}

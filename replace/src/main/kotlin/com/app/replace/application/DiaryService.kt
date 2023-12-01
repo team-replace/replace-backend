@@ -1,16 +1,15 @@
 package com.app.replace.application
 
-import com.app.replace.common.exception.BadRequestException
+import com.app.replace.application.exception.InvalidDateException
+import com.app.replace.application.request.ImageUploadingRequest
+import com.app.replace.application.response.*
 import com.app.replace.domain.*
-import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.annotation.JsonValue
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Service
@@ -19,14 +18,22 @@ class DiaryService(
     private val diaryRepository : DiaryRepository,
     private val connectionService: ConnectionService,
     private val userService: UserService,
-    private val imageService: ImageService
+    private val imageService: ImageService,
+    private val placeFinder: PlaceFinder
 ) {
-    fun createDiary(userId: Long, title: String, content: String, shareScope: String, imageURLs: List<String>): Long {
+    fun createDiary(
+        userId: Long,
+        title: String,
+        content: String,
+        shareScope: String,
+        coordinate: Coordinate,
+        imageURLs: List<String>
+    ): Long {
         val diary = diaryRepository.save(
             Diary(
                 Title(title),
                 Content(content),
-                Place("루터회관", "서울 송파구 올림픽로35다길 42"), // FIXME : 요청에서 장소 정보를 받도록 수정해야 한다
+                coordinate,
                 ImageURL.from(imageURLs),
                 userId,
                 ShareScope.valueOf(shareScope)
@@ -50,7 +57,7 @@ class DiaryService(
             Diary(
                 Title(title),
                 Content(content),
-                Place("루터회관", "서울 송파구 올림픽로35다길 42"), // FIXME : 요청에서 장소 정보를 받도록 수정해야 한다
+                diary.coordinate,
                 ImageURL.from(imageURLs),
                 userId,
                 ShareScope.valueOf(shareScope)
@@ -68,7 +75,7 @@ class DiaryService(
         val user = userService.loadSimpleUserInformationById(
             diary.userId ?: throw IllegalArgumentException("작성자 정보가 존재하지 않습니다.")
         )
-        return SingleDiaryRecord.from(diary, user)
+        return SingleDiaryRecord.from(diary, user, placeFinder)
     }
 
     fun uploadImages(images: List<MultipartFile>) : List<String> {
@@ -111,76 +118,4 @@ class DiaryService(
     }
 }
 
-data class DiaryPreviews(
-    val diaries: List<DiaryPreview>
-)
 
-data class DiaryPreview(
-    val user: Writer,
-    val contents: List<DiaryContentPreview>
-)
-
-private const val THUMBNAILS_MAX_SIZE = 3
-
-data class DiaryContentPreview(
-    val id: Long,
-    val title: String,
-    val thumbnails: List<String>,
-    val numOfExtraThumbnails: Int,
-    val createdAt: LocalDateTime
-) {
-    companion object {
-        fun from(diary: Diary): DiaryContentPreview {
-            val thumbnails = diary.imageURLs.map { url -> url.url }.toList()
-
-            if (thumbnails.size <= THUMBNAILS_MAX_SIZE) {
-                return DiaryContentPreview(
-                    diary.id!!,
-                    diary.title.title,
-                    thumbnails,
-                    0,
-                    diary.createdAt
-                )
-            }
-            return DiaryContentPreview(
-                diary.id!!,
-                diary.title.title,
-                thumbnails.subList(0, THUMBNAILS_MAX_SIZE),
-                if (THUMBNAILS_MAX_SIZE < thumbnails.size) thumbnails.size - THUMBNAILS_MAX_SIZE else 0,
-                diary.createdAt
-            )
-        }
-    }
-}
-
-data class SingleDiaryRecord(
-    val id: Long,
-    val images: List<ImageURLRecord>,
-    val place: Place,
-    val createdAt: String,
-    val writer: Writer,
-    @JsonUnwrapped val title: Title,
-    @JsonUnwrapped val content: Content
-) {
-    companion object {
-        fun from(diary: Diary, user: SimpleUserInformation): SingleDiaryRecord {
-            return SingleDiaryRecord(
-                diary.id ?: throw IllegalArgumentException("식별자가 존재하지 않는 일기장을 응답할 수 없습니다."),
-                diary.imageURLs
-                    .map { imageURL -> ImageURLRecord(imageURL.url) }
-                    .toList(),
-                diary.place,
-                diary.createdAt.toString(),
-                Writer(user.imageUrl, user.nickname),
-                diary.title,
-                diary.content
-            )
-        }
-    }
-}
-
-data class Writer(val profileImage: String, val nickname: String)
-
-data class ImageURLRecord(@JsonValue val imageURL: String)
-
-class InvalidDateException(override val message: String? = "선택할 수 없는 날짜입니다.") : BadRequestException(7000)

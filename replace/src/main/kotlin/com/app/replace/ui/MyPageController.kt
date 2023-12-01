@@ -1,7 +1,7 @@
 package com.app.replace.ui
 
-import com.app.replace.application.UserInformation
 import com.app.replace.application.UserService
+import com.app.replace.application.response.UserInformation
 import com.app.replace.ui.argumentresolver.Authenticated
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping

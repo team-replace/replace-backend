@@ -1,6 +1,9 @@
 package com.app.replace.ui
 
 import com.app.replace.application.*
+import com.app.replace.application.response.AloneUserInformation
+import com.app.replace.application.response.SimpleUserProfile
+import com.app.replace.application.response.UserInformationWithPartner
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import org.junit.jupiter.api.Test

@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 class Diary(
     @Embedded var title: Title,
     @Embedded var content: Content,
-    @Embedded var place: Place,
+    @Embedded var coordinate: Coordinate,
     imageURLs: List<ImageURL>,
     var userId: Long?,
     @Enumerated(EnumType.STRING)
@@ -30,7 +30,7 @@ class Diary(
     fun update(diary: Diary) {
         this.title = diary.title
         this.content = diary.content
-        this.place = diary.place
+        this.coordinate = diary.coordinate
         this.shareScope = diary.shareScope
         updateImageUrls(diary)
     }
