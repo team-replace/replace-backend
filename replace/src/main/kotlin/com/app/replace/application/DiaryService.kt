@@ -48,7 +48,6 @@ class DiaryService(
         title: String,
         content: String,
         shareScope: String,
-        coordinate: Coordinate,
         imageURLs: List<String>
     ) {
         val diary =
@@ -58,7 +57,7 @@ class DiaryService(
             Diary(
                 Title(title),
                 Content(content),
-                coordinate,
+                diary.coordinate,
                 ImageURL.from(imageURLs),
                 userId,
                 ShareScope.valueOf(shareScope)

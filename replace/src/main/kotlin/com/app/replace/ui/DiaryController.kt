@@ -6,6 +6,7 @@ import com.app.replace.application.response.SingleDiaryRecord
 import com.app.replace.ui.argumentresolver.Authenticated
 import com.app.replace.ui.request.CreateDiaryRequest
 import com.app.replace.ui.request.ImageUploadingRequest
+import com.app.replace.ui.request.UpdateDiaryRequest
 import com.app.replace.ui.response.ImageUploadingResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
@@ -57,16 +58,15 @@ class DiaryController(val diaryService: DiaryService) {
     fun updateDiary(
         @Authenticated userId: Long,
         @PathVariable diaryId: Long,
-        @RequestBody createDiaryRequest: CreateDiaryRequest
+        @RequestBody updateDiaryRequest: UpdateDiaryRequest
     ) {
         diaryService.updateDiary(
             userId,
             diaryId,
-            createDiaryRequest.title,
-            createDiaryRequest.content,
-            createDiaryRequest.shareScope,
-            createDiaryRequest.coordinate,
-            createDiaryRequest.images
+            updateDiaryRequest.title,
+            updateDiaryRequest.content,
+            updateDiaryRequest.shareScope,
+            updateDiaryRequest.images
         )
     }
 

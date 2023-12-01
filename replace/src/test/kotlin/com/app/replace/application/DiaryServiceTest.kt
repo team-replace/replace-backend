@@ -99,7 +99,6 @@ class DiaryServiceTest(
                     "케로의 방명록",
                     "케로는 이리내와 나란히 햄버거를 먹었다. 햄버거가 생각보다 맛있어 케로 혼자 4개를 먹었다.",
                     "US",
-                    Coordinate(BigDecimal("127.103068896795"), BigDecimal("37.5152535228382")),
                     listOf(
                         "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
                         "https://s3-us-west-2.amazonaws.com/mybucket/images/pic2.png",
@@ -125,7 +124,6 @@ class DiaryServiceTest(
                     "케로의 일기",
                     "케로는 롯데월드에 갔다. 그 곳에서 이리내와 결별했다.",
                     "US",
-                    Coordinate(BigDecimal("127.103068896795"), BigDecimal("37.5152535228382")),
                     listOf(
                         "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
                         "https://s3-us-west-2.amazonaws.com/mybucket/images/pic2.png",
@@ -150,7 +148,6 @@ class DiaryServiceTest(
                 "케로의 일기",
                 "케로는 이리내와 나란히 햄버거를 먹었다. 햄버거가 생각보다 맛있어 케로 혼자 4개를 먹었다.",
                 "US",
-                Coordinate(BigDecimal("127.103068896795"), BigDecimal("37.5152535228382")),
                 listOf(
                     "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
                     "https://s3-us-west-2.amazonaws.com/mybucket/images/pic2.png",
@@ -175,7 +172,6 @@ class DiaryServiceTest(
                 "케로의 일기",
                 "케로는 이리내와 나란히 햄버거를 먹었다. 햄버거가 생각보다 맛있어 케로 혼자 4개를 먹었다.",
                 "US",
-                Coordinate(BigDecimal("127.103068896795"), BigDecimal("37.5152535228382")),
                 listOf(
                     "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
                 )
@@ -197,7 +193,6 @@ class DiaryServiceTest(
                 "케로의 방명록",
                 "케로는 오늘 아무것도 하지 않았다.",
                 ShareScope.ALL.name,
-                Coordinate(BigDecimal("127.103068896795"), BigDecimal("37.5152535228382")),
                 listOf(
                     "https://mybucket.s3.amazonaws.com/images/photo1.jpg",
                 )
