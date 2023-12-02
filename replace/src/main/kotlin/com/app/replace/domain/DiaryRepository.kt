@@ -9,4 +9,8 @@ interface DiaryRepository : JpaRepository<Diary, Long> {
         from: LocalDateTime,
         to: LocalDateTime
     ): List<Diary>
+
+    fun findByUserIdAndCoordinateOrderByCreatedAtDesc(userId: Long, coordinate: Coordinate): List<Diary>
+
+    fun findByCoordinateOrderByCreatedAtDesc(coordinate: Coordinate): List<Diary>
 }

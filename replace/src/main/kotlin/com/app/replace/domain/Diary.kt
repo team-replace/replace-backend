@@ -10,8 +10,7 @@ class Diary(
     @Embedded var coordinate: Coordinate,
     imageURLs: List<ImageURL>,
     var userId: Long?,
-    @Enumerated(EnumType.STRING)
-    var shareScope: ShareScope,
+    @Enumerated(EnumType.STRING) var shareScope: ShareScope,
     override var createdAt: LocalDateTime = LocalDateTime.now()
 ) : TemporalRecord(createdAt) {
     @Id
