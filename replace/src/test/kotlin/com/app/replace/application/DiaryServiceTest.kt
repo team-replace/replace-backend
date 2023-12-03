@@ -353,6 +353,31 @@ class DiaryServiceTest(
         partnerDiaries.contents shouldHaveSize 0
     }
 
+    @Test
+    @DisplayName("특정한 좌표에서 작성한 모든 일기장을 조회할 수 있다.")
+    fun findDiariesByCoordinate() {
+        every { userService.loadSimpleUserInformationById(any(Long::class)) } returns SimpleUserInformation(
+            "케로",
+            "https://my-s3-bucket.s3.eu-central-1.amazonaws.com"
+        )
+
+        every { connectionService.findPartnerIdByUserId(1L) } returns 2L
+        `create a diary and return id`(1L)
+        `create a diary and return id`(2L)
+        `create a diary and return id`(3L)
+        `create a diary and return id`(4L)
+        `create a diary and return id`(5L)
+
+        val (place, coupleDiaries, allDiaries) = diaryService.loadDiariesByCoordinate(
+            1L,
+            Coordinate(BigDecimal("127.103068896795"), BigDecimal("37.5152535228382"))
+        )
+
+        place shouldBe Place("루터회관", "서울 송파구 올림픽로35다길 42")
+        coupleDiaries shouldHaveSize 2
+        allDiaries shouldHaveSize 3
+    }
+
     private fun `create a diary and return id`(userId: Long): Long {
         val diary = diaryService.createDiary(
             userId,

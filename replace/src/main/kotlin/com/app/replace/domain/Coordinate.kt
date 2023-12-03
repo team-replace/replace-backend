@@ -6,10 +6,10 @@ import java.math.BigDecimal
 
 @Embeddable
 class Coordinate(longitude: BigDecimal, latitude: BigDecimal) {
-    @Column
+    @Column(precision = 25, scale = 20)
     val longitude: BigDecimal
 
-    @Column
+    @Column(precision = 25, scale = 20)
     val latitude: BigDecimal
 
     init {

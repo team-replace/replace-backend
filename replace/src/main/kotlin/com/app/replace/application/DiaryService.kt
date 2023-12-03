@@ -11,11 +11,12 @@ import org.springframework.web.multipart.MultipartFile
 import java.time.Instant
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Objects
 
 @Service
 @Transactional
 class DiaryService(
-    private val diaryRepository : DiaryRepository,
+    private val diaryRepository: DiaryRepository,
     private val connectionService: ConnectionService,
     private val userService: UserService,
     private val imageService: ImageService,
@@ -78,7 +79,7 @@ class DiaryService(
         return SingleDiaryRecord.from(diary, user, placeFinder)
     }
 
-    fun uploadImages(images: List<MultipartFile>) : List<String> {
+    fun uploadImages(images: List<MultipartFile>): List<String> {
         val imageRequests = images.map { image ->
             ImageUploadingRequest(
                 image,
@@ -91,7 +92,7 @@ class DiaryService(
     }
 
     @Transactional(readOnly = true)
-    fun loadDiaries(userId: Long, date: LocalDate) : DiaryPreviews {
+    fun loadDiaries(userId: Long, date: LocalDate): DiaryPreviews {
         if (date.isAfter(LocalDate.now())) {
             throw InvalidDateException()
         }
@@ -100,21 +101,70 @@ class DiaryService(
         val partnerId = connectionService.findPartnerIdByUserId(userId)
         if (partnerId != null) ids.add(partnerId)
 
-        val diaryPreviews = ids.map { id -> loadDiaryPreviews(id, date) }.toList()
+        val diaryPreviews = ids.map { id -> loadDiaryPreview(id, date) }.toList()
         return DiaryPreviews(diaryPreviews)
     }
 
-    private fun loadDiaryPreviews(id: Long, date: LocalDate): DiaryPreview {
-        val (nickname, imageUrl) = userService.loadSimpleUserInformationById(id)
+    @Transactional(readOnly = true)
+    fun loadDiariesByCoordinate(userId: Long?, coordinate: Coordinate): DiaryPreviewsByCoordinate {
+        if (Objects.nonNull(userId)) {
+            return loadDiariesByCoordinate(userId!!, coordinate)
+        }
+
+        val place = placeFinder.findPlaceByCoordinate(coordinate)
+
+        val coupleDiaryPreviews = listOf<DiaryPreviewByCoordinate>()
+        val publicDiaries = diaryRepository.findByCoordinateOrderByCreatedAtDesc(coordinate).toList()
+        val publicDiaryPreviews =
+            publicDiaries.map { diary -> convertDiaryIntoDiaryPreviewByCoordinate(diary) }.toList()
+
+        return DiaryPreviewsByCoordinate(place, coupleDiaryPreviews, publicDiaryPreviews)
+    }
+
+    fun loadDiariesByCoordinate(userId: Long, coordinate: Coordinate): DiaryPreviewsByCoordinate {
+        val place = placeFinder.findPlaceByCoordinate(coordinate)
+
+        val ids = mutableListOf(userId)
+        val partnerId = connectionService.findPartnerIdByUserId(userId)
+        if (partnerId != null) ids.add(partnerId)
+
+        val coupleDiaryPreviews = ids.flatMap { id -> loadDiaryPreviewsByCoordinate(id, coordinate) }.toList()
+        val publicDiaries = diaryRepository.findByCoordinateOrderByCreatedAtDesc(coordinate)
+            .filter { diary -> !Objects.equals(diary.userId, userId) && !Objects.equals(diary.userId, partnerId) }
+            .toList()
+        val publicDiaryPreviews =
+            publicDiaries.map { diary -> convertDiaryIntoDiaryPreviewByCoordinate(diary) }.toList()
+
+        return DiaryPreviewsByCoordinate(place, coupleDiaryPreviews, publicDiaryPreviews)
+    }
+
+    private fun convertDiaryIntoDiaryPreviewByCoordinate(diary: Diary): DiaryPreviewByCoordinate {
+        val (nickname, imageUrl) = userService.loadSimpleUserInformationById(diary.userId!!)
+        return DiaryPreviewByCoordinate.from(diary, Writer(imageUrl, nickname))
+    }
+
+    private fun loadDiaryPreview(userId: Long, date: LocalDate): DiaryPreview {
+        val (nickname, imageUrl) = userService.loadSimpleUserInformationById(userId)
         val writer = Writer(imageUrl, nickname)
         val contents =
             diaryRepository.findByUserIdAndCreatedAtBetweenOrderByCreatedAtDesc(
-                id,
+                userId,
                 date.atStartOfDay(),
                 date.plusDays(1).atStartOfDay()
             )
                 .map(DiaryContentPreview.Companion::from).toList()
         return DiaryPreview(writer, contents)
+    }
+
+    private fun loadDiaryPreviewsByCoordinate(
+        userId: Long,
+        coordinate: Coordinate
+    ): List<DiaryPreviewByCoordinate> {
+        val (nickname, imageUrl) = userService.loadSimpleUserInformationById(userId)
+        val writer = Writer(imageUrl, nickname)
+        val diaries = diaryRepository.findByUserIdAndCoordinateOrderByCreatedAtDesc(userId, coordinate)
+
+        return diaries.map { diary -> DiaryPreviewByCoordinate.from(diary, writer) }.toList()
     }
 }
 
