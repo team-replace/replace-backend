@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class PlaceService(
-    val placeFinder: PlaceFinder
+    private val placeFinder: PlaceFinder
 ) {
     fun searchPlaceByKeyword(keyword: String, coordinate: Coordinate, page: Int, size: Int): List<PlaceWithCoordinate> {
         val pageRequest = getPageRequest(page, size)
