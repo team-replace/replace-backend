@@ -16,7 +16,7 @@ import java.util.Objects
 @Service
 @Transactional
 class DiaryService(
-    private val diaryRepository : DiaryRepository,
+    private val diaryRepository: DiaryRepository,
     private val connectionService: ConnectionService,
     private val userService: UserService,
     private val imageService: ImageService,
@@ -79,7 +79,7 @@ class DiaryService(
         return SingleDiaryRecord.from(diary, user, placeFinder)
     }
 
-    fun uploadImages(images: List<MultipartFile>) : List<String> {
+    fun uploadImages(images: List<MultipartFile>): List<String> {
         val imageRequests = images.map { image ->
             ImageUploadingRequest(
                 image,
@@ -92,7 +92,7 @@ class DiaryService(
     }
 
     @Transactional(readOnly = true)
-    fun loadDiaries(userId: Long, date: LocalDate) : DiaryPreviews {
+    fun loadDiaries(userId: Long, date: LocalDate): DiaryPreviews {
         if (date.isAfter(LocalDate.now())) {
             throw InvalidDateException()
         }
@@ -106,6 +106,21 @@ class DiaryService(
     }
 
     @Transactional(readOnly = true)
+    fun loadDiariesByCoordinate(userId: Long?, coordinate: Coordinate): DiaryPreviewsByCoordinate {
+        if (Objects.nonNull(userId)) {
+            return loadDiariesByCoordinate(userId!!, coordinate)
+        }
+
+        val place = placeFinder.findPlaceByCoordinate(coordinate)
+
+        val coupleDiaryPreviews = listOf<DiaryPreviewByCoordinate>()
+        val publicDiaries = diaryRepository.findByCoordinateOrderByCreatedAtDesc(coordinate).toList()
+        val publicDiaryPreviews =
+            publicDiaries.map { diary -> convertDiaryIntoDiaryPreviewByCoordinate(diary) }.toList()
+
+        return DiaryPreviewsByCoordinate(place, coupleDiaryPreviews, publicDiaryPreviews)
+    }
+
     fun loadDiariesByCoordinate(userId: Long, coordinate: Coordinate): DiaryPreviewsByCoordinate {
         val place = placeFinder.findPlaceByCoordinate(coordinate)
 
@@ -117,7 +132,8 @@ class DiaryService(
         val publicDiaries = diaryRepository.findByCoordinateOrderByCreatedAtDesc(coordinate)
             .filter { diary -> !Objects.equals(diary.userId, userId) && !Objects.equals(diary.userId, partnerId) }
             .toList()
-        val publicDiaryPreviews = publicDiaries.map { diary -> convertDiaryIntoDiaryPreviewByCoordinate(diary) }.toList()
+        val publicDiaryPreviews =
+            publicDiaries.map { diary -> convertDiaryIntoDiaryPreviewByCoordinate(diary) }.toList()
 
         return DiaryPreviewsByCoordinate(place, coupleDiaryPreviews, publicDiaryPreviews)
     }
@@ -140,7 +156,10 @@ class DiaryService(
         return DiaryPreview(writer, contents)
     }
 
-    private fun loadDiaryPreviewsByCoordinate(userId: Long, coordinate: Coordinate): List<DiaryPreviewByCoordinate> {
+    private fun loadDiaryPreviewsByCoordinate(
+        userId: Long,
+        coordinate: Coordinate
+    ): List<DiaryPreviewByCoordinate> {
         val (nickname, imageUrl) = userService.loadSimpleUserInformationById(userId)
         val writer = Writer(imageUrl, nickname)
         val diaries = diaryRepository.findByUserIdAndCoordinateOrderByCreatedAtDesc(userId, coordinate)

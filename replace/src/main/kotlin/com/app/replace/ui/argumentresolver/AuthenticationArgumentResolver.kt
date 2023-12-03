@@ -24,6 +24,13 @@ class AuthenticationArgumentResolver : HandlerMethodArgumentResolver {
     ): Any? {
         val request = webRequest.getNativeRequest() as HttpServletRequest
         return request.getAttribute(AUTH_USER_KEY) as Long?
-            ?: throw UnAuthenticatedException()
+            ?: checkAuthenticationRequired(parameter.getParameterAnnotation(Authenticated::class.java)!!)
+    }
+
+    private fun checkAuthenticationRequired(authenticated: Authenticated) : Long? {
+        if (authenticated.required) {
+            throw UnAuthenticatedException()
+        }
+        return null
     }
 }

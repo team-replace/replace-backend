@@ -32,7 +32,7 @@ class MainPageController(
 
     @GetMapping("/map")
     fun loadPlaceWithDiariesByCoordinate(
-        @Authenticated userId: Long,
+        @Authenticated(required = false) userId: Long?,
         @RequestParam latitude: String,
         @RequestParam longitude: String
     ) : ResponseEntity<DiaryPreviewsByCoordinate> {

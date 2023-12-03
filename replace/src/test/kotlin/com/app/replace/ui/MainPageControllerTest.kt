@@ -181,4 +181,61 @@ class MainPageControllerTest(
             .andExpect(jsonPath("$.allDiaries[0].numOfExtraThumbnails", `is`(4)))
             .andExpect(jsonPath("$.allDiaries[0].createdAt", hasSize(7), List::class.java)) // Assuming timestamp has 7 components
     }
+
+    @Test
+    @DisplayName("로그인하지 않은 채로 요청을 보내면 '우리의 일기장' 항목을 빈 리스트로 하여 응답한다.")
+    fun findDiaryWithoutLogin() {
+        every {
+            diaryService.loadDiariesByCoordinate(
+                null,
+                Coordinate(BigDecimal("127.10023101886318"), BigDecimal("37.51331105877401"))
+            )
+        } returns DiaryPreviewsByCoordinate(
+            Place("루터회관", "서울 송파구 올림픽로35다길 42"),
+            listOf(),
+            listOf(
+                DiaryPreviewByCoordinate(
+                    3L,
+                    SimpleUserProfile(
+                        "데이비드 쿠슈너",
+                        "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png"
+                    ),
+                    "데이비드 쿠슈너의 일기",
+                    listOf(
+                        "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png",
+                        "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png",
+                        "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png"
+                    ),
+                    4,
+                    LocalDateTime.now()
+                )
+            )
+        )
+
+        val result = mockMvc.perform(
+            MockMvcRequestBuilders.get("/map")
+                .param("longitude", "127.10023101886318")
+                .param("latitude", "37.51331105877401")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .characterEncoding(StandardCharsets.UTF_8)
+
+        )
+
+        // Verify the status code is 200 OK
+        // Verify the status code is 200 OK
+        result.andExpect(status().isOk())
+
+        // Verify the response JSON matches the expected structure
+        result.andExpect(jsonPath("$.place.spotName", `is`("루터회관")))
+            .andExpect(jsonPath("$.place.roadAddress", `is`("서울 송파구 올림픽로35다길 42")))
+            .andExpect(jsonPath("$.coupleDiaries", hasSize(0), List::class.java)) // Assuming 2 couple diaries
+            .andExpect(jsonPath("$.allDiaries", hasSize(1), List::class.java)) // Assuming 1 all diary
+            // All Diary
+            .andExpect(jsonPath("$.allDiaries[0].id", `is`(3)))
+            .andExpect(jsonPath("$.allDiaries[0].user.nickname", `is`("데이비드 쿠슈너")))
+            .andExpect(jsonPath("$.allDiaries[0].title", `is`("데이비드 쿠슈너의 일기")))
+            .andExpect(jsonPath("$.allDiaries[0].thumbnails", hasSize(3), List::class.java)) // Assuming 3 thumbnails
+            .andExpect(jsonPath("$.allDiaries[0].numOfExtraThumbnails", `is`(4)))
+            .andExpect(jsonPath("$.allDiaries[0].createdAt", hasSize(7), List::class.java)) // Assuming timestamp has 7 components
+    }
 }
