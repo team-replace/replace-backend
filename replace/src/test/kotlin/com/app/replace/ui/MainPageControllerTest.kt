@@ -165,21 +165,39 @@ class MainPageControllerTest(
             .andExpect(jsonPath("$.coupleDiaries[0].title", `is`("크롱의 일기")))
             .andExpect(jsonPath("$.coupleDiaries[0].thumbnails", hasSize(3), List::class.java)) // Assuming 3 thumbnails
             .andExpect(jsonPath("$.coupleDiaries[0].numOfExtraThumbnails", `is`(4)))
-            .andExpect(jsonPath("$.coupleDiaries[0].createdAt", hasSize(7), List::class.java)) // Assuming timestamp has 7 components
+            .andExpect(
+                jsonPath(
+                    "$.coupleDiaries[0].createdAt",
+                    hasSize(7),
+                    List::class.java
+                )
+            ) // Assuming timestamp has 7 components
             // Couple Diary 2
             .andExpect(jsonPath("$.coupleDiaries[1].id", `is`(2)))
             .andExpect(jsonPath("$.coupleDiaries[1].user.nickname", `is`("콩하나")))
             .andExpect(jsonPath("$.coupleDiaries[1].title", `is`("콩하나의 일기")))
             .andExpect(jsonPath("$.coupleDiaries[1].thumbnails", hasSize(3), List::class.java)) // Assuming 3 thumbnails
             .andExpect(jsonPath("$.coupleDiaries[1].numOfExtraThumbnails", `is`(4)))
-            .andExpect(jsonPath("$.coupleDiaries[1].createdAt", hasSize(7), List::class.java)) // Assuming timestamp has 7 components
+            .andExpect(
+                jsonPath(
+                    "$.coupleDiaries[1].createdAt",
+                    hasSize(7),
+                    List::class.java
+                )
+            ) // Assuming timestamp has 7 components
             // All Diary
             .andExpect(jsonPath("$.allDiaries[0].id", `is`(3)))
             .andExpect(jsonPath("$.allDiaries[0].user.nickname", `is`("데이비드 쿠슈너")))
             .andExpect(jsonPath("$.allDiaries[0].title", `is`("데이비드 쿠슈너의 일기")))
             .andExpect(jsonPath("$.allDiaries[0].thumbnails", hasSize(3), List::class.java)) // Assuming 3 thumbnails
             .andExpect(jsonPath("$.allDiaries[0].numOfExtraThumbnails", `is`(4)))
-            .andExpect(jsonPath("$.allDiaries[0].createdAt", hasSize(7), List::class.java)) // Assuming timestamp has 7 components
+            .andExpect(
+                jsonPath(
+                    "$.allDiaries[0].createdAt",
+                    hasSize(7),
+                    List::class.java
+                )
+            ) // Assuming timestamp has 7 components
     }
 
     @Test
@@ -236,6 +254,60 @@ class MainPageControllerTest(
             .andExpect(jsonPath("$.allDiaries[0].title", `is`("데이비드 쿠슈너의 일기")))
             .andExpect(jsonPath("$.allDiaries[0].thumbnails", hasSize(3), List::class.java)) // Assuming 3 thumbnails
             .andExpect(jsonPath("$.allDiaries[0].numOfExtraThumbnails", `is`(4)))
-            .andExpect(jsonPath("$.allDiaries[0].createdAt", hasSize(7), List::class.java)) // Assuming timestamp has 7 components
+            .andExpect(
+                jsonPath(
+                    "$.allDiaries[0].createdAt",
+                    hasSize(7),
+                    List::class.java
+                )
+            ) // Assuming timestamp has 7 components
+    }
+
+    @Test
+    @DisplayName("일기장이 작성된 모든 장소의 좌표 목록을 읽어올 수 있다.")
+    fun findCoordinatesHavingDiaries() {
+        every {
+            diaryService.loadAllCoordinatesHavingDiary()
+        } returns listOf(
+            Coordinate(BigDecimal("77.0365"), BigDecimal("38.8977")),
+            Coordinate(BigDecimal("126.9769"), BigDecimal("37.5816"))
+        )
+
+        val result = mockMvc.perform(
+            MockMvcRequestBuilders.get("/map/coordinate")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .characterEncoding(StandardCharsets.UTF_8)
+        )
+
+        result.andExpect(status().isOk())
+            .andExpect(jsonPath("$.diaryCoordinates").isArray())
+            .andExpect(
+                jsonPath(
+                    "$.diaryCoordinates[0].longitude",
+                    equalTo(BigDecimal("77.0365")),
+                    BigDecimal::class.java
+                )
+            )
+            .andExpect(
+                jsonPath(
+                    "$.diaryCoordinates[0].latitude",
+                    equalTo(BigDecimal("38.8977")),
+                    BigDecimal::class.java
+                )
+            )
+            .andExpect(
+                jsonPath(
+                    "$.diaryCoordinates[1].longitude",
+                    equalTo(BigDecimal("126.9769")),
+                    BigDecimal::class.java
+                )
+            )
+            .andExpect(
+                jsonPath(
+                    "$.diaryCoordinates[1].latitude",
+                    equalTo(BigDecimal("37.5816")),
+                    BigDecimal::class.java
+                )
+            )
     }
 }
