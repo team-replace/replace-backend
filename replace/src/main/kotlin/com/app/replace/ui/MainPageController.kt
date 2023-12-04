@@ -5,6 +5,7 @@ import com.app.replace.application.PlaceService
 import com.app.replace.application.response.DiaryPreviewsByCoordinate
 import com.app.replace.domain.Coordinate
 import com.app.replace.ui.argumentresolver.Authenticated
+import com.app.replace.ui.response.CoordinatesResponse
 import com.app.replace.ui.response.SearchPlacesResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -24,7 +25,7 @@ class MainPageController(
         @RequestParam query: String,
         @RequestParam page: Int,
         @RequestParam size: Int
-    ) : ResponseEntity<SearchPlacesResponse> {
+    ): ResponseEntity<SearchPlacesResponse> {
         val coordinate = Coordinate(BigDecimal(longitude), BigDecimal(latitude))
         val places = placeService.searchPlaceByKeyword(query, coordinate, page, size)
         return ResponseEntity.ok(SearchPlacesResponse(places))
@@ -35,8 +36,14 @@ class MainPageController(
         @Authenticated(required = false) userId: Long?,
         @RequestParam latitude: String,
         @RequestParam longitude: String
-    ) : ResponseEntity<DiaryPreviewsByCoordinate> {
+    ): ResponseEntity<DiaryPreviewsByCoordinate> {
         val coordinate = Coordinate(BigDecimal(longitude), BigDecimal(latitude))
         return ResponseEntity.ok(diaryService.loadDiariesByCoordinate(userId, coordinate))
+    }
+
+    @GetMapping("/map/coordinate")
+    fun loadAllCoordinatesHavingDiaries() : ResponseEntity<CoordinatesResponse> {
+        val coordinates = diaryService.loadAllCoordinatesHavingDiary()
+        return ResponseEntity.ok(CoordinatesResponse.from(coordinates))
     }
 }

@@ -138,6 +138,12 @@ class DiaryService(
         return DiaryPreviewsByCoordinate(place, coupleDiaryPreviews, publicDiaryPreviews)
     }
 
+    fun loadAllCoordinatesHavingDiary(): List<Coordinate> {
+        return diaryRepository.findAll()
+            .map { diary -> diary.coordinate }
+            .toList()
+    }
+
     private fun convertDiaryIntoDiaryPreviewByCoordinate(diary: Diary): DiaryPreviewByCoordinate {
         val (nickname, imageUrl) = userService.loadSimpleUserInformationById(diary.userId!!)
         return DiaryPreviewByCoordinate.from(diary, Writer(imageUrl, nickname))
