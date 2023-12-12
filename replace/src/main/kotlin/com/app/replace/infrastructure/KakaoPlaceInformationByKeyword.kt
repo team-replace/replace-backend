@@ -2,6 +2,7 @@ package com.app.replace.infrastructure
 
 import com.app.replace.domain.Coordinate
 import com.app.replace.domain.PlaceWithCoordinate
+import com.app.replace.ui.response.CoordinateResponse
 import java.math.BigDecimal
 
 data class KakaoPlaceInformationByKeyword(
@@ -12,9 +13,11 @@ data class KakaoPlaceInformationByKeyword(
         return documents.map { document ->
             PlaceWithCoordinate(
                 document.get("place_name") ?: "unknown",
-                Coordinate(
-                    BigDecimal(document.get("x")),
-                    BigDecimal((document.get("y")))
+                CoordinateResponse.from(
+                    Coordinate(
+                        BigDecimal(document.get("x")),
+                        BigDecimal((document.get("y")))
+                    )
                 ),
             )
         }.toList()
