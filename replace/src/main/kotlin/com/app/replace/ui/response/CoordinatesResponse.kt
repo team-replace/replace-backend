@@ -1,7 +1,6 @@
 package com.app.replace.ui.response
 
 import com.app.replace.domain.Coordinate
-import java.math.BigDecimal
 
 data class CoordinatesResponse(val diaryCoordinates: List<CoordinateResponse>) {
     companion object {
@@ -12,12 +11,15 @@ data class CoordinatesResponse(val diaryCoordinates: List<CoordinateResponse>) {
 }
 
 data class CoordinateResponse(
-    val longitude: BigDecimal,
-    val latitude: BigDecimal
+    val longitude: String,
+    val latitude: String
 ) {
     companion object {
         fun from(coordinate: Coordinate): CoordinateResponse {
-            return CoordinateResponse(coordinate.longitude, coordinate.latitude)
+            return CoordinateResponse(
+                coordinate.longitude.toPlainString(),
+                coordinate.latitude.toPlainString()
+            )
         }
     }
 }

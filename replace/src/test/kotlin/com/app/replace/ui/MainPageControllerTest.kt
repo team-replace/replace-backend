@@ -8,6 +8,7 @@ import com.app.replace.application.response.SimpleUserProfile
 import com.app.replace.domain.Coordinate
 import com.app.replace.domain.Place
 import com.app.replace.domain.PlaceWithCoordinate
+import com.app.replace.ui.response.CoordinateResponse
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import org.hamcrest.Matchers.*
@@ -48,14 +49,17 @@ class MainPageControllerTest(
                 10
             )
         } returns listOf(
-            PlaceWithCoordinate("한국루터회관", Coordinate(BigDecimal("127.10305689374302"), BigDecimal("37.5152439826822"))),
+            PlaceWithCoordinate(
+                "한국루터회관",
+                CoordinateResponse.from(Coordinate(BigDecimal("127.10305689374302"), BigDecimal("37.5152439826822")))
+            ),
             PlaceWithCoordinate(
                 "한국루터회관 주차장",
-                Coordinate(BigDecimal("127.102995850174"), BigDecimal("37.5152710660296"))
+                CoordinateResponse.from(Coordinate(BigDecimal("127.102995850174"), BigDecimal("37.5152710660296")))
             ),
             PlaceWithCoordinate(
                 "한국루터회관 전기차충전소",
-                Coordinate(BigDecimal("127.103069349741"), BigDecimal("37.5152538828512"))
+                CoordinateResponse.from(Coordinate(BigDecimal("127.103069349741"), BigDecimal("37.5152538828512")))
             )
         )
 
@@ -67,16 +71,16 @@ class MainPageControllerTest(
             .andDo(MockMvcResultHandlers.print())
             .andExpect(status().isOk)
             .andExpect(jsonPath("places[0].spotName", equalTo("한국루터회관")))
-            .andExpect(jsonPath("places[0].coordinate.longitude", equalTo(127.10305689374302)))
-            .andExpect(jsonPath("places[0].coordinate.latitude", equalTo(37.5152439826822)))
+            .andExpect(jsonPath("places[0].coordinate.longitude", equalTo("127.10305689374302")))
+            .andExpect(jsonPath("places[0].coordinate.latitude", equalTo("37.5152439826822")))
 
             .andExpect(jsonPath("places[1].spotName", equalTo("한국루터회관 주차장")))
-            .andExpect(jsonPath("places[1].coordinate.longitude", equalTo(127.102995850174)))
-            .andExpect(jsonPath("places[1].coordinate.latitude", equalTo(37.5152710660296)))
+            .andExpect(jsonPath("places[1].coordinate.longitude", equalTo("127.102995850174")))
+            .andExpect(jsonPath("places[1].coordinate.latitude", equalTo("37.5152710660296")))
 
             .andExpect(jsonPath("places[2].spotName", equalTo("한국루터회관 전기차충전소")))
-            .andExpect(jsonPath("places[2].coordinate.longitude", closeTo(127.103069349741, 0.000001)))
-            .andExpect(jsonPath("places[2].coordinate.latitude", closeTo(37.5152538828512, 0.000001)));
+            .andExpect(jsonPath("places[2].coordinate.longitude", equalTo("127.103069349741")))
+            .andExpect(jsonPath("places[2].coordinate.latitude", equalTo("37.5152538828512")))
     }
 
     @Test
