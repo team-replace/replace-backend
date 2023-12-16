@@ -3,7 +3,7 @@ package com.app.replace.ui
 import com.app.replace.application.DiaryService
 import com.app.replace.application.PlaceService
 import com.app.replace.application.response.DiaryPreviewByCoordinate
-import com.app.replace.application.response.DiaryPreviewsByCoordinate
+import com.app.replace.application.response.CompleteDiaryPreviewsByCoordinate
 import com.app.replace.application.response.SimpleUserProfile
 import com.app.replace.domain.Coordinate
 import com.app.replace.domain.Place
@@ -89,9 +89,11 @@ class MainPageControllerTest(
         every {
             diaryService.loadDiariesByCoordinate(
                 1L,
-                Coordinate(BigDecimal("127.10023101886318"), BigDecimal("37.51331105877401"))
+                Coordinate(BigDecimal("127.10023101886318"), BigDecimal("37.51331105877401")),
+                null,
+                null
             )
-        } returns DiaryPreviewsByCoordinate(
+        } returns CompleteDiaryPreviewsByCoordinate(
             Place("루터회관", "서울 송파구 올림픽로35다길 42"),
             listOf(
                 DiaryPreviewByCoordinate(
@@ -210,9 +212,11 @@ class MainPageControllerTest(
         every {
             diaryService.loadDiariesByCoordinate(
                 null,
-                Coordinate(BigDecimal("127.10023101886318"), BigDecimal("37.51331105877401"))
+                Coordinate(BigDecimal("127.10023101886318"), BigDecimal("37.51331105877401")),
+                null,
+                null
             )
-        } returns DiaryPreviewsByCoordinate(
+        } returns CompleteDiaryPreviewsByCoordinate(
             Place("루터회관", "서울 송파구 올림픽로35다길 42"),
             listOf(),
             listOf(

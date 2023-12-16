@@ -4,6 +4,7 @@ import com.app.replace.application.exception.InvalidDateException
 import com.app.replace.application.request.ImageUploadingRequest
 import com.app.replace.application.response.*
 import com.app.replace.domain.*
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -106,9 +107,28 @@ class DiaryService(
     }
 
     @Transactional(readOnly = true)
-    fun loadDiariesByCoordinate(userId: Long?, coordinate: Coordinate): DiaryPreviewsByCoordinate {
+    fun loadDiariesByCoordinate(
+        userId: Long?,
+        coordinate: Coordinate,
+        size: Int?,
+        page: Int?
+    ): DiaryPreviewsByCoordinate {
+        if (Objects.isNull(size) || Objects.isNull(page) || Objects.equals(page, 0)) {
+            return this.loadDiariesByCoordinateForUnauthenticated(userId, coordinate)
+        }
+
+        val pageRequest = PageRequest.of(page!!, size!!)
+        val pagedPublicRequests =
+            diaryRepository.findByCoordinateOrderByCreatedAtDesc(coordinate, pageRequest)
+
+        val publicDiaryPreviews =
+            pagedPublicRequests.map { diary -> convertDiaryIntoDiaryPreviewByCoordinate(diary) }.toList()
+        return DiaryPreviewsByCoordinate(publicDiaryPreviews)
+    }
+
+    private fun loadDiariesByCoordinateForUnauthenticated(userId: Long?, coordinate: Coordinate): CompleteDiaryPreviewsByCoordinate {
         if (Objects.nonNull(userId)) {
-            return loadDiariesByCoordinate(userId!!, coordinate)
+            return loadDiariesByCoordinateForAuthenticated(userId!!, coordinate)
         }
 
         val place = placeFinder.findPlaceByCoordinate(coordinate)
@@ -118,10 +138,10 @@ class DiaryService(
         val publicDiaryPreviews =
             publicDiaries.map { diary -> convertDiaryIntoDiaryPreviewByCoordinate(diary) }.toList()
 
-        return DiaryPreviewsByCoordinate(place, coupleDiaryPreviews, publicDiaryPreviews)
+        return CompleteDiaryPreviewsByCoordinate(place, coupleDiaryPreviews, publicDiaryPreviews)
     }
 
-    fun loadDiariesByCoordinate(userId: Long, coordinate: Coordinate): DiaryPreviewsByCoordinate {
+    private fun loadDiariesByCoordinateForAuthenticated(userId: Long, coordinate: Coordinate): CompleteDiaryPreviewsByCoordinate {
         val place = placeFinder.findPlaceByCoordinate(coordinate)
 
         val ids = mutableListOf(userId)
@@ -135,7 +155,7 @@ class DiaryService(
         val publicDiaryPreviews =
             publicDiaries.map { diary -> convertDiaryIntoDiaryPreviewByCoordinate(diary) }.toList()
 
-        return DiaryPreviewsByCoordinate(place, coupleDiaryPreviews, publicDiaryPreviews)
+        return CompleteDiaryPreviewsByCoordinate(place, coupleDiaryPreviews, publicDiaryPreviews)
     }
 
     fun loadAllCoordinatesHavingDiary(): List<Coordinate> {

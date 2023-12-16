@@ -35,10 +35,12 @@ class MainPageController(
     fun loadPlaceWithDiariesByCoordinate(
         @Authenticated(required = false) userId: Long?,
         @RequestParam latitude: String,
-        @RequestParam longitude: String
+        @RequestParam longitude: String,
+        @RequestParam(required = false) page: Int?,
+        @RequestParam(required = false) size: Int?
     ): ResponseEntity<DiaryPreviewsByCoordinate> {
         val coordinate = Coordinate(BigDecimal(longitude), BigDecimal(latitude))
-        return ResponseEntity.ok(diaryService.loadDiariesByCoordinate(userId, coordinate))
+        return ResponseEntity.ok(diaryService.loadDiariesByCoordinate(userId, coordinate, size, page))
     }
 
     @GetMapping("/map/coordinate")
