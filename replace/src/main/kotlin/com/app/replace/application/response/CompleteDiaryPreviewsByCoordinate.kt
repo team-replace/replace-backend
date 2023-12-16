@@ -9,10 +9,14 @@ private const val THUMBNAILS_MAX_SIZE = 3
 open class CompleteDiaryPreviewsByCoordinate(
     val place: Place,
     val coupleDiaries: List<DiaryPreviewByCoordinate>,
-    override val allDiaries: List<DiaryPreviewByCoordinate>
-) : DiaryPreviewsByCoordinate(allDiaries)
+    override val allDiaries: List<DiaryPreviewByCoordinate>,
+    override val isLast: Boolean
+) : DiaryPreviewsByCoordinate(allDiaries, isLast)
 
-open class DiaryPreviewsByCoordinate(open val allDiaries: List<DiaryPreviewByCoordinate>)
+open class DiaryPreviewsByCoordinate(
+    open val allDiaries: List<DiaryPreviewByCoordinate>,
+    open val isLast: Boolean
+)
 
 data class DiaryPreviewByCoordinate(
     val id: Long,

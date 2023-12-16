@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.context.annotation.Import
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.transaction.support.TransactionTemplate
 import java.math.BigDecimal
@@ -410,13 +411,14 @@ class DiaryServiceTest(
             Coordinate(
                 BigDecimal("127.103068896795"),
                 BigDecimal("37.5152535228382")
-            )
+            ), PageRequest.of(0, 10)
         )
         assertThat(result.allDiaries).extracting("id").contains(
-            allDiaries.get(3).id,
-            allDiaries.get(4).id,
-            allDiaries.get(5).id
+            allDiaries.content.get(3).id,
+            allDiaries.content.get(4).id,
+            allDiaries.content.get(5).id
         )
+        assertThat(result.isLast).isFalse()
     }
 
     private fun `create a diary and return id`(userId: Long): Long {

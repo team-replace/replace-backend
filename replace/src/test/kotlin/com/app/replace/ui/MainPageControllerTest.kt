@@ -144,7 +144,8 @@ class MainPageControllerTest(
                     4,
                     LocalDateTime.now()
                 )
-            )
+            ),
+            true
         )
 
         val result = mockMvc.perform(
@@ -157,7 +158,6 @@ class MainPageControllerTest(
 
         )
 
-        // Verify the status code is 200 OK
         // Verify the status code is 200 OK
         result.andExpect(status().isOk())
 
@@ -204,7 +204,8 @@ class MainPageControllerTest(
                     hasSize(7),
                     List::class.java
                 )
-            ) // Assuming timestamp has 7 components
+            )
+            .andExpect(jsonPath("$.isLast").value(true))
     }
 
     @Test
@@ -236,7 +237,8 @@ class MainPageControllerTest(
                     4,
                     LocalDateTime.now()
                 )
-            )
+            ),
+            true
         )
 
         val result = mockMvc.perform(
@@ -248,7 +250,6 @@ class MainPageControllerTest(
 
         )
 
-        // Verify the status code is 200 OK
         // Verify the status code is 200 OK
         result.andExpect(status().isOk())
 
@@ -269,7 +270,8 @@ class MainPageControllerTest(
                     hasSize(7),
                     List::class.java
                 )
-            ) // Assuming timestamp has 7 components
+            )
+            .andExpect(jsonPath("$.isLast").value(true))
     }
 
     @Test
@@ -376,7 +378,8 @@ class MainPageControllerTest(
                     4,
                     LocalDateTime.now()
                 )
-            )
+            ),
+            true
         )
 
         val result = mockMvc.perform(
@@ -407,6 +410,7 @@ class MainPageControllerTest(
             .andExpect(jsonPath("$.allDiaries[2].user.nickname").value("바운디"))
             .andExpect(jsonPath("$.allDiaries[2].title").value("바운디의 일기"))
             .andExpect(jsonPath("$.allDiaries[2].thumbnails[0]").value("https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png"))
-            .andExpect(jsonPath("$.allDiaries[2].numOfExtraThumbnails").value(4));
+            .andExpect(jsonPath("$.allDiaries[2].numOfExtraThumbnails").value(4))
+            .andExpect(jsonPath("$.isLast").value(true))
     }
 }

@@ -122,8 +122,8 @@ class DiaryService(
             diaryRepository.findByCoordinateOrderByCreatedAtDesc(coordinate, pageRequest)
 
         val publicDiaryPreviews =
-            pagedPublicRequests.map { diary -> convertDiaryIntoDiaryPreviewByCoordinate(diary) }.toList()
-        return DiaryPreviewsByCoordinate(publicDiaryPreviews)
+            pagedPublicRequests.content.map { diary -> convertDiaryIntoDiaryPreviewByCoordinate(diary) }.toList()
+        return DiaryPreviewsByCoordinate(publicDiaryPreviews, pagedPublicRequests.isLast)
     }
 
     private fun loadDiariesByCoordinateForUnauthenticated(userId: Long?, coordinate: Coordinate): CompleteDiaryPreviewsByCoordinate {
@@ -134,11 +134,11 @@ class DiaryService(
         val place = placeFinder.findPlaceByCoordinate(coordinate)
 
         val coupleDiaryPreviews = listOf<DiaryPreviewByCoordinate>()
-        val publicDiaries = diaryRepository.findByCoordinateOrderByCreatedAtDesc(coordinate).toList()
+        val publicDiaries = diaryRepository.findByCoordinateOrderByCreatedAtDesc(coordinate, PageRequest.of(0, 10))
         val publicDiaryPreviews =
-            publicDiaries.map { diary -> convertDiaryIntoDiaryPreviewByCoordinate(diary) }.toList()
+            publicDiaries.content.map { diary -> convertDiaryIntoDiaryPreviewByCoordinate(diary) }.toList()
 
-        return CompleteDiaryPreviewsByCoordinate(place, coupleDiaryPreviews, publicDiaryPreviews)
+        return CompleteDiaryPreviewsByCoordinate(place, coupleDiaryPreviews, publicDiaryPreviews, publicDiaries.isLast)
     }
 
     private fun loadDiariesByCoordinateForAuthenticated(userId: Long, coordinate: Coordinate): CompleteDiaryPreviewsByCoordinate {
@@ -149,13 +149,14 @@ class DiaryService(
         if (partnerId != null) ids.add(partnerId)
 
         val coupleDiaryPreviews = ids.flatMap { id -> loadDiaryPreviewsByCoordinate(id, coordinate) }.toList()
-        val publicDiaries = diaryRepository.findByCoordinateOrderByCreatedAtDesc(coordinate)
+        val publicDiaries = diaryRepository.findByCoordinateOrderByCreatedAtDesc(coordinate, PageRequest.of(0, 10))
+        val publicDiariesContents = publicDiaries.content
             .filter { diary -> !Objects.equals(diary.userId, userId) && !Objects.equals(diary.userId, partnerId) }
             .toList()
         val publicDiaryPreviews =
-            publicDiaries.map { diary -> convertDiaryIntoDiaryPreviewByCoordinate(diary) }.toList()
+            publicDiariesContents.map { diary -> convertDiaryIntoDiaryPreviewByCoordinate(diary) }.toList()
 
-        return CompleteDiaryPreviewsByCoordinate(place, coupleDiaryPreviews, publicDiaryPreviews)
+        return CompleteDiaryPreviewsByCoordinate(place, coupleDiaryPreviews, publicDiaryPreviews, publicDiaries.isLast)
     }
 
     fun loadAllCoordinatesHavingDiary(): List<Coordinate> {
