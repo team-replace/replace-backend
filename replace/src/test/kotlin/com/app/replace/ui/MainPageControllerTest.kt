@@ -4,6 +4,7 @@ import com.app.replace.application.DiaryService
 import com.app.replace.application.PlaceService
 import com.app.replace.application.response.DiaryPreviewByCoordinate
 import com.app.replace.application.response.CompleteDiaryPreviewsByCoordinate
+import com.app.replace.application.response.DiaryPreviewsByCoordinate
 import com.app.replace.application.response.SimpleUserProfile
 import com.app.replace.domain.Coordinate
 import com.app.replace.domain.Place
@@ -317,5 +318,95 @@ class MainPageControllerTest(
                     BigDecimal::class.java
                 )
             )
+    }
+
+    @Test
+    fun `page와 size정보를 제공하면 전체공유 일기장 정보를 페이징하여 보여준다`() {
+        every {
+            diaryService.loadDiariesByCoordinate(
+                null,
+                Coordinate(BigDecimal("127.10023101886318"), BigDecimal("37.51331105877401")),
+                3,
+                1
+            )
+        } returns DiaryPreviewsByCoordinate(
+            listOf(
+                DiaryPreviewByCoordinate(
+                    3L,
+                    SimpleUserProfile(
+                        "데이비드 쿠슈너",
+                        "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png"
+                    ),
+                    "데이비드 쿠슈너의 일기",
+                    listOf(
+                        "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png",
+                        "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png",
+                        "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png"
+                    ),
+                    4,
+                    LocalDateTime.now()
+                ),
+                DiaryPreviewByCoordinate(
+                    4L,
+                    SimpleUserProfile(
+                        "킹누",
+                        "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png"
+                    ),
+                    "킹누의 일기",
+                    listOf(
+                        "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png",
+                        "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png",
+                        "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png"
+                    ),
+                    4,
+                    LocalDateTime.now()
+                ),
+                DiaryPreviewByCoordinate(
+                    5L,
+                    SimpleUserProfile(
+                        "바운디",
+                        "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png"
+                    ),
+                    "바운디의 일기",
+                    listOf(
+                        "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png",
+                        "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png",
+                        "https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png"
+                    ),
+                    4,
+                    LocalDateTime.now()
+                )
+            )
+        )
+
+        val result = mockMvc.perform(
+            MockMvcRequestBuilders.get("/map")
+                .param("longitude", "127.10023101886318")
+                .param("latitude", "37.51331105877401")
+                .param("size", "3")
+                .param("page", "1")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .characterEncoding(StandardCharsets.UTF_8)
+        )
+
+        result.andExpect(status().isOk())
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(jsonPath("$.allDiaries[0].id").value(3))
+            .andExpect(jsonPath("$.allDiaries[0].user.nickname").value("데이비드 쿠슈너"))
+            .andExpect(jsonPath("$.allDiaries[0].title").value("데이비드 쿠슈너의 일기"))
+            .andExpect(jsonPath("$.allDiaries[0].thumbnails[0]").value("https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png"))
+            .andExpect(jsonPath("$.allDiaries[0].numOfExtraThumbnails").value(4))
+
+            .andExpect(jsonPath("$.allDiaries[1].id").value(4))
+            .andExpect(jsonPath("$.allDiaries[1].user.nickname").value("킹누"))
+            .andExpect(jsonPath("$.allDiaries[1].title").value("킹누의 일기"))
+            .andExpect(jsonPath("$.allDiaries[1].thumbnails[0]").value("https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png"))
+            .andExpect(jsonPath("$.allDiaries[1].numOfExtraThumbnails").value(4))
+
+            .andExpect(jsonPath("$.allDiaries[2].id").value(5))
+            .andExpect(jsonPath("$.allDiaries[2].user.nickname").value("바운디"))
+            .andExpect(jsonPath("$.allDiaries[2].title").value("바운디의 일기"))
+            .andExpect(jsonPath("$.allDiaries[2].thumbnails[0]").value("https://replace-s3.s3.ap-northeast-2.amazonaws.com/client/profile/replace-default-profile-image.png"))
+            .andExpect(jsonPath("$.allDiaries[2].numOfExtraThumbnails").value(4));
     }
 }
