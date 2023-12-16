@@ -1,6 +1,8 @@
 package com.app.replace.application
 
 import com.app.replace.application.exception.InvalidDateException
+import com.app.replace.application.response.CompleteDiaryPreviewsByCoordinate
+import com.app.replace.application.response.DiaryPreviewsByCoordinate
 import com.app.replace.application.response.SimpleUserInformation
 import com.app.replace.domain.*
 import com.ninjasquad.springmockk.MockkBean
@@ -9,7 +11,7 @@ import io.kotest.matchers.date.shouldHaveSameDayAs
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import jakarta.persistence.EntityManager
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -18,6 +20,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.context.annotation.Import
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.transaction.support.TransactionTemplate
 import java.math.BigDecimal
@@ -77,7 +80,7 @@ class DiaryServiceTest(
         diaries shouldHaveSize 1
         diaries.get(0).id shouldBe diaryId
 
-        Assertions.assertThat(diaries.get(0))
+        assertThat(diaries.get(0))
             .extracting("imageURLs").asList()
             .hasSize(3)
     }
@@ -249,7 +252,7 @@ class DiaryServiceTest(
 
     @Test
     fun `선택 불가능한 날짜를 입력했을 때 발생하는 예외 코드는 7000이다`() {
-        Assertions.assertThatThrownBy { diaryService.loadDiaries(1L, LocalDate.of(2099, 12, 4)) }
+        assertThatThrownBy { diaryService.loadDiaries(1L, LocalDate.of(2099, 12, 4)) }
             .isInstanceOf(InvalidDateException::class.java)
             .hasMessage("선택할 수 없는 날짜입니다.")
             .extracting("code").isEqualTo(7000)
@@ -368,14 +371,54 @@ class DiaryServiceTest(
         `create a diary and return id`(4L)
         `create a diary and return id`(5L)
 
-        val (place, coupleDiaries, allDiaries) = diaryService.loadDiariesByCoordinate(
+        val result = diaryService.loadDiariesByCoordinate(
             1L,
-            Coordinate(BigDecimal("127.103068896795"), BigDecimal("37.5152535228382"))
+            Coordinate(BigDecimal("127.103068896795"), BigDecimal("37.5152535228382")),
+            null,
+            null
+        ) as CompleteDiaryPreviewsByCoordinate
+
+        result.place shouldBe Place("루터회관", "서울 송파구 올림픽로35다길 42")
+        result.coupleDiaries shouldHaveSize 2
+        result.allDiaries shouldHaveSize 3
+    }
+
+    @Test
+    fun `page와 size 정보를 입력하면 전체공개 일기장 정보를 페이징하여 열람할 수 있다`() {
+        every { userService.loadSimpleUserInformationById(any(Long::class)) } returns SimpleUserInformation(
+            "케로",
+            "https://my-s3-bucket.s3.eu-central-1.amazonaws.com"
         )
 
-        place shouldBe Place("루터회관", "서울 송파구 올림픽로35다길 42")
-        coupleDiaries shouldHaveSize 2
-        allDiaries shouldHaveSize 3
+        every { connectionService.findPartnerIdByUserId(1L) } returns 2L
+
+        for (i: Long in 2L..10L) {
+            `create a diary and return id`(i)
+        }
+
+        val result = diaryService.loadDiariesByCoordinate(
+            1L,
+            Coordinate(BigDecimal("127.103068896795"), BigDecimal("37.5152535228382")),
+            3,
+            1
+        )
+
+        assertThat(result).isInstanceOf(DiaryPreviewsByCoordinate::class.java)
+
+        result.allDiaries shouldHaveSize 3
+
+        val allDiaries = diaryRepository.findByCoordinateOrderByCreatedAtDesc(
+            Coordinate(
+                BigDecimal("127.103068896795"),
+                BigDecimal("37.5152535228382")
+            ), PageRequest.of(0, 10)
+        )
+        assertThat(result.allDiaries).extracting("id").contains(
+            allDiaries.content.get(3).id,
+            allDiaries.content.get(4).id,
+            allDiaries.content.get(5).id
+        )
+        assertThat(result.isLast).isFalse()
     }
 
     private fun `create a diary and return id`(userId: Long): Long {

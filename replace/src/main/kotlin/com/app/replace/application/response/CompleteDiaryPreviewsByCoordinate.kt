@@ -6,10 +6,16 @@ import java.time.LocalDateTime
 
 private const val THUMBNAILS_MAX_SIZE = 3
 
-data class DiaryPreviewsByCoordinate(
+open class CompleteDiaryPreviewsByCoordinate(
     val place: Place,
     val coupleDiaries: List<DiaryPreviewByCoordinate>,
-    val allDiaries: List<DiaryPreviewByCoordinate>
+    override val allDiaries: List<DiaryPreviewByCoordinate>,
+    override val isLast: Boolean
+) : DiaryPreviewsByCoordinate(allDiaries, isLast)
+
+open class DiaryPreviewsByCoordinate(
+    open val allDiaries: List<DiaryPreviewByCoordinate>,
+    open val isLast: Boolean
 )
 
 data class DiaryPreviewByCoordinate(
