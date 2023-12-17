@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 private const val KAKAO_MAP_API_URL = "https://dapi.kakao.com/v2/local"
 
@@ -50,6 +52,23 @@ class KakaoMapPlaceFinder(
             ?: throw IllegalCoordinateException()
 
         return responseEntity.getPlace()
+    }
+
+    override fun zeroCoordinate(coordinate: Coordinate) : Coordinate {
+        val place = this.findPlaceByCoordinate(coordinate)
+        val encodedRoadAddress = URLEncoder.encode(place.roadAddress, StandardCharsets.UTF_8)
+
+        val kakaoRestApiUrl =
+            URI.create("${KAKAO_MAP_API_URL}/search/address.json?query=${encodedRoadAddress}")
+
+        val headers = HttpHeaders()
+        headers.add("Authorization", restApiKey)
+
+        val requestEntity = RequestEntity<Map<String, String>>(headers, HttpMethod.GET, kakaoRestApiUrl)
+        val responseEntity = restTemplate.exchange(requestEntity, KakaoPlaceInformationByRoadAddress::class.java).body
+            ?: throw IllegalCoordinateException()
+
+        return responseEntity.getCoordinate()
     }
 
     private fun makeRequestUrlOfPlaceByKeyword(

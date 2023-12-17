@@ -51,4 +51,24 @@ class KakaoMapPlaceFinderTest(
 
         placeWithCoordinates shouldHaveSize 10
     }
+
+    @Test
+    @DisplayName("같은 건물을 지칭하나 MAP에 등록된 좌표와 오차가 있는 좌표정보를 교정할 수 있다.")
+    fun zeroingCoordinate() {
+        val coordinate = kakaoMapPlaceFinder.zeroCoordinate(
+            Coordinate(
+                BigDecimal("127.10023101886318"),
+                BigDecimal("37.51331105877401")
+            )
+        )
+
+        val zeroedFromMisalignedCoordinate = kakaoMapPlaceFinder.zeroCoordinate(
+            Coordinate(
+                BigDecimal("127.10023101886338"),
+                BigDecimal("37.51331105877421")
+            )
+        )
+
+        coordinate shouldBe zeroedFromMisalignedCoordinate
+    }
 }

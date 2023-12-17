@@ -113,13 +113,15 @@ class DiaryService(
         size: Int?,
         page: Int?
     ): DiaryPreviewsByCoordinate {
+        val zeroedCoordinate = placeFinder.zeroCoordinate(coordinate)
+
         if (Objects.isNull(size) || Objects.isNull(page) || Objects.equals(page, 0)) {
-            return this.loadDiariesByCoordinateForUnauthenticated(userId, coordinate)
+            return this.loadDiariesByCoordinateForUnauthenticated(userId, zeroedCoordinate)
         }
 
         val pageRequest = PageRequest.of(page!!, size!!)
         val pagedPublicRequests =
-            diaryRepository.findByCoordinateOrderByCreatedAtDesc(coordinate, pageRequest)
+            diaryRepository.findByCoordinateOrderByCreatedAtDesc(zeroedCoordinate, pageRequest)
 
         val publicDiaryPreviews =
             pagedPublicRequests.content.map { diary -> convertDiaryIntoDiaryPreviewByCoordinate(diary) }.toList()
