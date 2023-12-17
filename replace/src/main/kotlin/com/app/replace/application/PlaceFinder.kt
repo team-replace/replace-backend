@@ -9,4 +9,6 @@ interface PlaceFinder {
     fun findPlaceByCoordinate(coordinate: Coordinate): Place
 
     fun findPlaceByKeyword(keyword: String, coordinate: Coordinate, pageable: Pageable): List<PlaceWithCoordinate>
+
+    fun zeroCoordinate(coordinate: Coordinate): Coordinate
 }
