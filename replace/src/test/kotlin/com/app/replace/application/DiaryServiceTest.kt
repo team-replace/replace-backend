@@ -58,6 +58,15 @@ class DiaryServiceTest(
         )
 
         every { placeFinder.findPlaceByCoordinate(any(Coordinate::class)) } returns Place("루터회관", "서울 송파구 올림픽로35다길 42")
+
+        every {
+            placeFinder.zeroCoordinate(
+                Coordinate(
+                    BigDecimal("127.103068896795"),
+                    BigDecimal("37.5152535228382")
+                )
+            )
+        } returns Coordinate(BigDecimal("127.103068896795"), BigDecimal("37.5152535228382"))
     }
 
     @Test
@@ -366,15 +375,6 @@ class DiaryServiceTest(
 
         every { connectionService.findPartnerIdByUserId(1L) } returns 2L
 
-        every {
-            placeFinder.zeroCoordinate(
-                Coordinate(
-                    BigDecimal("127.103068896795"),
-                    BigDecimal("37.5152535228382")
-                )
-            )
-        } returns Coordinate(BigDecimal("127.103068896795"), BigDecimal("37.5152535228382"))
-
         `create a diary and return id`(1L)
         `create a diary and return id`(2L)
         `create a diary and return id`(3L)
@@ -401,15 +401,6 @@ class DiaryServiceTest(
         )
 
         every { connectionService.findPartnerIdByUserId(1L) } returns 2L
-
-        every {
-            placeFinder.zeroCoordinate(
-                Coordinate(
-                    BigDecimal("127.103068896795"),
-                    BigDecimal("37.5152535228382")
-                )
-            )
-        } returns Coordinate(BigDecimal("127.103068896795"), BigDecimal("37.5152535228382"))
 
         for (i: Long in 2L..10L) {
             `create a diary and return id`(i)
