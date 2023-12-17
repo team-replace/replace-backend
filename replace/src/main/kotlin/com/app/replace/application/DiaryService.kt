@@ -31,11 +31,13 @@ class DiaryService(
         coordinate: Coordinate,
         imageURLs: List<String>
     ): Long {
+        val zeroedCoordinate = placeFinder.zeroCoordinate(coordinate)
+
         val diary = diaryRepository.save(
             Diary(
                 Title(title),
                 Content(content),
-                coordinate,
+                zeroedCoordinate,
                 ImageURL.from(imageURLs),
                 userId,
                 ShareScope.valueOf(shareScope)
